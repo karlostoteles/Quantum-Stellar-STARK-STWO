@@ -1,0 +1,71 @@
+{
+  "network": "testnet",
+  "events": [
+    {
+      "at": "2026-10-15T22:26:45.304Z",
+      "kind": "deploy",
+      "upload_tx": "ff5ea2c34c52bf0bbe58f88dcd4382d948696797171ad096674e49f869882c45",
+      "create_tx": "bf8aa92e94e6a43caf3651adaba33acb6a1f262f4d2e88b111aa331e535d9af2",
+      "contract": "CCHOM5ONNJVD3G4ECVG44MJHMHOWXYZXBFGW5PEDI2R5SV7I557PCIJ3",
+      "wasm_bytes": 129372
+    },
+    {
+      "at": "2026-10-15T22:26:53.952Z",
+      "kind": "verify",
+      "proof": "proofs/keccak/compact.bin",
+      "proof_bytes": 12875,
+      "tx": "c34ba5b24f95686ea93dc18e371a49802bbca210c0d6ca8d64f3ef89307d8b6c",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 13228,
+      "ledger": 5215925,
+      "instructions": 35980178,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 48405,
+      "min_resource_fee_stroops": 48405,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 4,
+        "proof_sha256": "8582925ce8bc9b7ed2eec093c3495c94e40af4d6bd8d55335750b9035bedb73f",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-15T22:27:14.013Z",
+      "kind": "verify",
+      "proof": "proofs/keccak/standard.bin",
+      "proof_bytes": 71245,
+      "tx": "e6e62ee2190826c4810a4e83987ec32496360eae2d0711b3423baced29e09933",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 71600,
+      "ledger": 5215929,
+      "instructions": 188249851,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 234041,
+      "min_resource_fee_stroops": 234041,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 10,
+        "proof_sha256": "dc6cf8be32144b2aef95413e29bf6dd3d24ab6577e67b3bba8dabde0d187892c",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-15T22:27:17.362Z",
+      "kind": "reject",
+      "proof": "proofs/keccak/compact-bad-proof.bin",
+      "proof_bytes": 12875,
+      "tx": "fadf3a889b9a0401f23c78ee42d92a5c8ee2272da7b33be913f29026d207abff",
+      "status": "FAILED",
+      "ledger": 5215930
+    }
+  ],
+  "contract": "CCHOM5ONNJVD3G4ECVG44MJHMHOWXYZXBFGW5PEDI2R5SV7I557PCIJ3",
+  "wasm_sha256": "d7b3779f53d54ac263652c173a9af1f75dcb4f590822331247249e0724ab5f59",
+  "wasm_bytes": 129372
+}

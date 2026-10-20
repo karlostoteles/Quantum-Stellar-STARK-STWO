@@ -1,0 +1,21 @@
+{
+  "file": "proofs/compact.bin",
+  "fri": {
+    "fold_step": 3,
+    "log_blowup_factor": 8,
+    "log_last_layer_degree_bound": 0,
+    "n_queries": 9,
+    "pow_bits": 24,
+    "security_bits": 96
+  },
+  "native_verify_us": 358,
+  "proof_bytes": 12813,
+  "prove_ms": 280,
+  "statement": {
+    "a0": 1,
+    "a1": 3141592,
+    "last": 1476137047,
+    "log_n_rows": 4,
+    "terms": 100
+  }
+}

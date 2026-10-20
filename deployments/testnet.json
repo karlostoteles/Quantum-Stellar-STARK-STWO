@@ -1,0 +1,125 @@
+{
+  "network": "testnet",
+  "events": [
+    {
+      "at": "2026-10-13T12:44:22.881Z",
+      "kind": "deploy",
+      "upload_tx": "cbe8000dc0a05472bc3c83f5e7a9906c5835058837a685570f17a7a31644c8c9",
+      "create_tx": "efb2cbffd6df0d65436c258c2c325a0f9af7a82245b6a1bf13be1ad9d6635bee",
+      "contract": "CDFOUAERT7D5QVALKWUWJWRDPNZWUHDQCMQ5ZR7H32WWMKAPNQVD7NR4",
+      "wasm_bytes": 116225
+    },
+    {
+      "at": "2026-10-13T12:45:09.154Z",
+      "kind": "verify",
+      "proof": "proofs/compact.bin",
+      "proof_bytes": 27798,
+      "tx": "fa7ee30fbc96bff35eff3e1ef857d4557929445db308620b8b2f23cc8f5f00d5",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 28152,
+      "ledger": 5174384,
+      "instructions": 225212532,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 304463,
+      "min_resource_fee_stroops": 304463,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 10,
+        "proof_sha256": "f352d6a235cde560eed0b7bbc57b8e5a4d21e6c19f8d39bd06cbb264657679c0",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-13T12:59:43.786Z",
+      "kind": "deploy",
+      "upload_tx": "43403d3067e2c3757764dc957733b7b9dfefcd5407a838c68e3779e880ddfc4b",
+      "create_tx": "b9093c68788173b16accf225c5c1804b8f3c535b2dc1a8ba4a139b12a82ae9c7",
+      "contract": "CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG",
+      "wasm_bytes": 126650
+    },
+    {
+      "at": "2026-10-13T12:59:47.670Z",
+      "kind": "verify",
+      "proof": "proofs/compact.bin",
+      "proof_bytes": 12813,
+      "tx": "b5b83965591a9976836447d418420b50974233152f5bfba13c01a29146712a92",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 13168,
+      "ledger": 5174560,
+      "instructions": 45418055,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 106741,
+      "min_resource_fee_stroops": 106741,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 4,
+        "proof_sha256": "97062f689e7f3b1d518d6a421aa729ff1658901f03c5b38805086b73bc70e98d",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-13T12:59:58.222Z",
+      "kind": "verify",
+      "proof": "proofs/standard.bin",
+      "proof_bytes": 71701,
+      "tx": "b7fede74f7b47178cc97f0124b95aded6bac7e235c79c0488a777f19f45a9a71",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 72056,
+      "ledger": 5174562,
+      "instructions": 227905305,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 516932,
+      "min_resource_fee_stroops": 516932,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 10,
+        "proof_sha256": "054ef83c1263ce35e76ed9b2a81caf34275a78f6eee4a339957e66fca32e1014",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-13T13:00:03.676Z",
+      "kind": "reject",
+      "proof": "proofs/compact-bad-proof.bin",
+      "proof_bytes": 12813,
+      "tx": "42d173ffb5e6c2f71941200d5bb6d565bd317e5969e25ee1417ac6599122ae7b",
+      "status": "FAILED",
+      "ledger": 5174563
+    },
+    {
+      "at": "2026-10-19T12:05:02.431Z",
+      "kind": "verify",
+      "proof": "proofs/compact-192.bin",
+      "proof_bytes": 26164,
+      "tx": "d024ae8d4ef366353a1d204249175633cbf4b8a8a341421bee7925bf6b8d0aee",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 26516,
+      "ledger": 5277583,
+      "instructions": 77707666,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 92783,
+      "min_resource_fee_stroops": 92783,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 4,
+        "proof_sha256": "38817330e05f319efc97af216294701783dd5db6a3910b310c1fd4c31926fc1a",
+        "security_bits": 192
+      }
+    }
+  ],
+  "contract": "CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG",
+  "wasm_sha256": "22143bfea52a6827c0faf01913ba57d2464c3c0e970a3374f5318276a6441627",
+  "wasm_bytes": 126650
+}

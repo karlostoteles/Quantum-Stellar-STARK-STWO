@@ -1,0 +1,6 @@
+/target
+*.log
+.stellar/
+node_modules/
+.keys/
+contracts/verifier/test_snapshots/

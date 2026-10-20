@@ -1,0 +1,21 @@
+{
+  "file": "proofs/standard.bin",
+  "fri": {
+    "fold_step": 1,
+    "log_blowup_factor": 1,
+    "log_last_layer_degree_bound": 0,
+    "n_queries": 70,
+    "pow_bits": 26,
+    "security_bits": 96
+  },
+  "native_verify_us": 1741,
+  "proof_bytes": 71701,
+  "prove_ms": 14455,
+  "statement": {
+    "a0": 1,
+    "a1": 3141592,
+    "last": 1476137047,
+    "log_n_rows": 10,
+    "terms": 100
+  }
+}

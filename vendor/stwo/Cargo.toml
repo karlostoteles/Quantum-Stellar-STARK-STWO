@@ -1,0 +1,90 @@
+[package]
+name = "stwo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core library implementing the Circle STARK prover and verifier"
+
+[features]
+default = ["std"]
+std = [
+    "blake2/std",
+    "blake3/std",
+    "hex/std",
+    "itertools/use_std",
+    "indexmap/std",
+    "num-traits/std",
+    "starknet-crypto/std",
+    "thiserror/std",
+    "tracing/std",
+    "serde/std",
+    "tracing-subscriber/std",
+    "stwo-std-shims/std",
+]
+prover = ["std", "tracing/attributes", "dep:dashmap"]
+parallel = ["rayon", "indexmap/rayon"]
+slow-tests = []
+# stwo-soroban patch: hash Keccak-256 through an external function (see PATCHES.md).
+host-keccak = []
+tracing = []
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+blake2.workspace = true
+blake3.workspace = true
+sha3.workspace = true
+bytemuck = { workspace = true, features = ["derive", "extern_crate_alloc"] }
+cfg-if.workspace = true
+educe.workspace = true
+hex.workspace = true
+indexmap.workspace = true
+fnv.workspace = true
+itertools.workspace = true
+num-traits.workspace = true
+rand.workspace = true
+starknet-crypto = { version = "0.6.2", default-features = false, features = [
+    "alloc",
+] }
+starknet-ff = { version = "0.3.7", default-features = false, features = [
+    "alloc",
+    "serde",
+] }
+thiserror.workspace = true
+tracing.workspace = true
+rayon = { workspace = true, optional = true }
+serde.workspace = true
+tracing-subscriber.workspace = true
+hashbrown.workspace = true
+stwo-std-shims.workspace = true
+dashmap = { workspace = true, optional = true }
+
+
+[package.metadata.cargo-machete]
+ignored = ["stwo-std-shims"]
+
+
+
+
+[lib]
+bench = false
+crate-type = ["lib"]
+
+[lints.rust]
+future-incompatible = "deny"
+nonstandard-style = "deny"
+rust-2018-idioms = "deny"
+
+[lints.clippy]
+missing_const_for_fn = "warn"
+
+
+
+
+
+
+
+
+
+
+
+

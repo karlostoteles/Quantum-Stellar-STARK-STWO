@@ -1,0 +1,78 @@
+{
+  "network": "testnet",
+  "slots": {
+    "1": {
+      "verifier": "CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG",
+      "proof": "proofs/compact.bin",
+      "proof_bytes": 12813,
+      "proof_sha256": "97062f689e7f3b1d518d6a421aa729ff1658901f03c5b38805086b73bc70e98d",
+      "lab": "https://lab.stellar.org/endpoints/rpc/simulate-transaction?$=network$id=testnet&label=Testnet&horizonUrl=https:////horizon-testnet.stellar.org&rpcUrl=https:////soroban-testnet.stellar.org&passphrase=Test%20SDF%20Network%20/;%20September%202015;&endpoints$params$tx=AAAAAgAAAAAHc1AbT//j3cSqPkihNn1KBRD1qb9xoEflwC75DDCyq7QAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABx8hn1Ftz35LVgRVo//iiBIyAAZohttZlw0zTApFHH//H4AAAADcnVuAAAAAAEAAAADAAAAAQAAAAAAAAAAAAAAAA==;;"
+    },
+    "2": {
+      "verifier": "CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG",
+      "proof": "proofs/compact-bad-proof.bin",
+      "proof_bytes": 12813,
+      "proof_sha256": "4c329e66f580463077be7e1f5b6b5417173b2e4492e0291a25ee72eb749f8167",
+      "lab": "https://lab.stellar.org/endpoints/rpc/simulate-transaction?$=network$id=testnet&label=Testnet&horizonUrl=https:////horizon-testnet.stellar.org&rpcUrl=https:////soroban-testnet.stellar.org&passphrase=Test%20SDF%20Network%20/;%20September%202015;&endpoints$params$tx=AAAAAgAAAAAHc1AbT//j3cSqPkihNn1KBRD1qb9xoEflwC75DDCyq7QAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABx8hn1Ftz35LVgRVo//iiBIyAAZohttZlw0zTApFHH//H4AAAADcnVuAAAAAAEAAAADAAAAAgAAAAAAAAAAAAAAAA==;;"
+    },
+    "3": {
+      "verifier": "CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG",
+      "proof": "proofs/standard.bin",
+      "proof_bytes": 71701,
+      "proof_sha256": "054ef83c1263ce35e76ed9b2a81caf34275a78f6eee4a339957e66fca32e1014",
+      "lab": "https://lab.stellar.org/endpoints/rpc/simulate-transaction?$=network$id=testnet&label=Testnet&horizonUrl=https:////horizon-testnet.stellar.org&rpcUrl=https:////soroban-testnet.stellar.org&passphrase=Test%20SDF%20Network%20/;%20September%202015;&endpoints$params$tx=AAAAAgAAAAAHc1AbT//j3cSqPkihNn1KBRD1qb9xoEflwC75DDCyq7QAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABx8hn1Ftz35LVgRVo//iiBIyAAZohttZlw0zTApFHH//H4AAAADcnVuAAAAAAEAAAADAAAAAwAAAAAAAAAAAAAAAA==;;"
+    },
+    "4": {
+      "verifier": "CCHOM5ONNJVD3G4ECVG44MJHMHOWXYZXBFGW5PEDI2R5SV7I557PCIJ3",
+      "proof": "proofs/keccak/compact.bin",
+      "proof_bytes": 12875,
+      "proof_sha256": "8582925ce8bc9b7ed2eec093c3495c94e40af4d6bd8d55335750b9035bedb73f",
+      "lab": "https://lab.stellar.org/endpoints/rpc/simulate-transaction?$=network$id=testnet&label=Testnet&horizonUrl=https:////horizon-testnet.stellar.org&rpcUrl=https:////soroban-testnet.stellar.org&passphrase=Test%20SDF%20Network%20/;%20September%202015;&endpoints$params$tx=AAAAAgAAAAAHc1AbT//j3cSqPkihNn1KBRD1qb9xoEflwC75DDCyq7QAAAGQAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABx8hn1Ftz35LVgRVo//iiBIyAAZohttZlw0zTApFHH//H4AAAADcnVuAAAAAAEAAAADAAAABAAAAAAAAAAAAAAAAA==;;"
+    }
+  },
+  "events": [
+    {
+      "at": "2026-10-15T22:38:48.505Z",
+      "kind": "deploy",
+      "upload_tx": "a189a8f2fd1101ef03c4116f6a230fd3e138af4bc22ef5e775f6f15d7a5c2ccd",
+      "create_tx": "7968d94a643153ec2376564b389366b48b76445e6f97a30788d5ad0e8170ab92",
+      "wasm_bytes": 5916
+    },
+    {
+      "at": "2026-10-15T22:38:57.445Z",
+      "kind": "put",
+      "slot": 1,
+      "chunk": 0,
+      "tx": "767a72da31fa6b5eb864ac80af317835f6a2f3fffcfcc1b12601908a36b9d263"
+    },
+    {
+      "at": "2026-10-15T22:39:18.633Z",
+      "kind": "put",
+      "slot": 2,
+      "chunk": 0,
+      "tx": "821f978b0c7e312f54970e4e91ade6e1888fb7f94f5db846477257df974d81f9"
+    },
+    {
+      "at": "2026-10-15T22:39:24.521Z",
+      "kind": "put",
+      "slot": 3,
+      "chunk": 0,
+      "tx": "af881ef53a21029eb91835e45ea36da17f5030b600358bece2a10160f3510a0a"
+    },
+    {
+      "at": "2026-10-15T22:39:38.146Z",
+      "kind": "put",
+      "slot": 3,
+      "chunk": 1,
+      "tx": "407bbd22d0d2701365a2a37a8b0c17f04491bc2fa48416a8239cb97a4423fa76"
+    },
+    {
+      "at": "2026-10-15T22:39:43.569Z",
+      "kind": "put",
+      "slot": 4,
+      "chunk": 0,
+      "tx": "00c7ad448efedf2ebceeae6813e40b80601311091208e02e2db1964602e01883"
+    }
+  ],
+  "contract": "CDD4QZ6ULNZ57EWVQEKWR7RIQERSAADGRBW3LGLQ2M2MBJCRY76H4QRB"
+}

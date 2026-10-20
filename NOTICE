@@ -1,0 +1,8 @@
+stwo-soroban
+
+vendor/stwo and vendor/stwo-constraint-framework are copies of StarkWare's Stwo prover/verifier
+(https://github.com/starkware-libs/proving, commit 150a06b3c3a959b3c82d1dab9d3ede8aa5006c33,
+2026-10-04), licensed under the Apache License 2.0 (vendor/LICENSE-stwo). The changes made to
+them are listed in PATCHES.md.
+
+The rest of this repository is licensed under the Apache License 2.0 (LICENSE).

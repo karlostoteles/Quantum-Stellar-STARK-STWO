@@ -1,0 +1,5 @@
+# Only the Soroban contract is built for wasm32v1-none. These flags drop panic messages,
+# panic locations and Debug formatting, which keeps the contract under Soroban's 128 KiB limit
+# at opt-level "s". They need nightly and a rebuilt core (see scripts/build-contract.sh).
+[target.wasm32v1-none]
+rustflags = ["-Zlocation-detail=none", "-Zfmt-debug=none", "-Zunstable-options", "-Cpanic=immediate-abort"]

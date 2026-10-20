@@ -1,0 +1,14 @@
+[package]
+name = "stwo-soroban-demo"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+description = "Keeps proofs on chain so anyone can re-run the verifier with a tiny transaction."
+
+[lib]
+crate-type = ["cdylib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = { version = "29.0.1" }

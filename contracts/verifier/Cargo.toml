@@ -1,0 +1,31 @@
+[package]
+name = "stwo-soroban-verifier"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+description = "Soroban contract that verifies Stwo (Circle STARK) proofs on chain."
+
+[lib]
+crate-type = ["cdylib"]
+doctest = false
+
+[features]
+# Hash with the host's keccak256 instead of Blake2s compiled into the contract.
+keccak = ["stwo-soroban-air/keccak", "stwo/host-keccak"]
+# Profiling entry points, not for deployment.
+probe = []
+
+[dependencies]
+soroban-sdk = { version = "29.0.1", features = ["alloc"] }
+stwo-soroban-air = { workspace = true }
+stwo = { workspace = true }
+postcard = { workspace = true }
+
+# starknet-ff (pulled in by stwo for its Poseidon channel) depends on getrandom, which has no
+# backend on wasm32v1-none. The verifier never draws randomness; the stub only satisfies the link.
+[target.'cfg(target_family = "wasm")'.dependencies]
+getrandom = { version = "0.2", default-features = false, features = ["custom"] }
+
+[dev-dependencies]
+soroban-sdk = { version = "29.0.1", features = ["testutils", "alloc"] }

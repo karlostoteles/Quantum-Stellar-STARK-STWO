@@ -1,0 +1,5 @@
+# The Stwo prover needs nightly (portable_simd). Same toolchain as starkware-libs/proving.
+[toolchain]
+channel = "nightly-2026-01-15"
+targets = ["wasm32v1-none"]
+profile = "minimal"

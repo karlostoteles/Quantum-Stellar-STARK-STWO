@@ -1,0 +1,25 @@
+[package]
+name = "stwo-soroban-recovery"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+description = "Prototype: post-cutoff recovery of an Ed25519 account by committing to and then revealing its seed."
+
+[lib]
+crate-type = ["cdylib"]
+doctest = false
+
+[features]
+# Also exposes check_key_wasm, which computes [s]B with Curve25519 arithmetic compiled into the
+# contract instead of using the host's ed25519_verify. Only for measuring; not for deployment.
+wasm-ec = []
+
+[dependencies]
+soroban-sdk = { version = "29.0.1" }
+sha2 = { version = "0.10.9", default-features = false }
+curve25519-dalek = { version = "4.1.3", default-features = false }
+
+[dev-dependencies]
+soroban-sdk = { version = "29.0.1", features = ["testutils"] }
+ed25519-dalek = { version = "2.2.0", default-features = false }

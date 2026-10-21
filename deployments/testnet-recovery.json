@@ -1,0 +1,64 @@
+{
+  "network": "testnet",
+  "events": [
+    {
+      "at": "2026-10-21T09:00:39.035Z",
+      "kind": "deploy",
+      "upload_tx": "638b8c180f4c1bca88a7b754b8f8c19b3748c3f9e1a212c776574515c0641844",
+      "create_tx": "2a09c48e5fa1db452c1a40bd4933a6caa2647729580a2bd2fdd2697ee2bab170"
+    },
+    {
+      "at": "2026-10-21T09:10:58.372Z",
+      "kind": "race",
+      "account": "GCMSPRC5D3LHE5535YPGMTVSOO7V3TSAO6GHV5VOPTFI4NDAZY5TVVWJ",
+      "seed_hex": "f505511bc44cde93d702662c6370e93c4eef4fa70be8e49f50377c187de49ee2",
+      "owner_key_sha256": "2f6a3f2d8451e1c83ad696cdf2d14866cd7205f2332fcf51ad95a8f4a4add7f6",
+      "thief_key_sha256": "f0349c08a1a2d0ea6259dfe49c577e544d49945678ea71758c258867cc791ee5",
+      "steps": [
+        {
+          "step": "owner commits",
+          "tx": "5a125b7bf29a7df620b51af4ba4d9f1082ea7c53f1cbe063f87c4f3a58247ce4",
+          "ledger": 5309933,
+          "instructions": 508545,
+          "resource_fee_stroops": 135392,
+          "envelope_bytes": 496,
+          "result": null
+        },
+        {
+          "step": "thief commits to the seed with their key",
+          "tx": "bb1066613bae769c5cb0246a6ed0d331f0760bcd9e41f86915f2c2afafa91fdf",
+          "ledger": 5309994,
+          "instructions": 508545,
+          "resource_fee_stroops": 135435,
+          "envelope_bytes": 496,
+          "result": null
+        },
+        {
+          "step": "owner's reveal lands",
+          "tx": "296cb61b56c69b7961ecbaad1c542b183da3ca829f9b3b51af5e7506c65a70a7",
+          "ledger": 5309996,
+          "instructions": 1430577,
+          "resource_fee_stroops": 262151,
+          "envelope_bytes": 1972,
+          "result": {
+            "committed_at": 5309933,
+            "new_key_sha256": "2f6a3f2d8451e1c83ad696cdf2d14866cd7205f2332fcf51ad95a8f4a4add7f6",
+            "recovered_at": 5309996
+          }
+        }
+      ],
+      "thief_reveals_at_once": "Error(Contract, #2)",
+      "thief_reveals_after_the_delay": "Error(Contract, #3)",
+      "recovered": {
+        "committed_at": 5309933,
+        "new_key_sha256": "2f6a3f2d8451e1c83ad696cdf2d14866cd7205f2332fcf51ad95a8f4a4add7f6",
+        "recovered_at": 5309996
+      }
+    }
+  ],
+  "contract": "CBBGCPAY2YG7N6KCTGYTNNF46GD4H7LRYW5YWTMQ2J3WG25TKUI4GZ36",
+  "cutoff_ledger": 5309927,
+  "delay_ledgers": 60,
+  "wasm_bytes": 29797,
+  "wasm_sha256": "24d3dfda2b395eb8c1eb3076ce88f5715f68f4a8b64dab471b3173f8571b6d92"
+}

@@ -1,0 +1,24 @@
+{
+  "network": "testnet",
+  "runs": [
+    {
+      "at": "2026-10-21T09:03:57.705Z",
+      "seed_hex": "1d81f47f58660120e5e8ba8ff8dfce79f646c2841a46c543bb7b3ef9bd307273",
+      "host_ed25519_verify": 1097592,
+      "wasm_curve25519": 23283138,
+      "ratio": 21.2
+    },
+    {
+      "at": "2026-10-21T09:04:15.543Z",
+      "seed_hex": "db47fb598a76d859db89f614ef98dc8402adf3729823fe9dc2f5ba9ad84cf8c5",
+      "host_ed25519_verify": 1097592,
+      "wasm_curve25519": 23283138,
+      "ratio": 21.2
+    }
+  ],
+  "contract": "CCABS67QB7WXXQJWGBSUE7MNIUV5TKR5TJ53DYP3XQCRQQXPKDCIJ4JH",
+  "wasm_bytes": 38196,
+  "wasm_sha256": "16799c5b8d426f3e9fe8fcd5d083524f282b89113eace3dd5b9d9c1821aa6440",
+  "upload_tx": "bc869664775ee2fa01c80403b70e60cfb21328601d28dfa81dd67696317511ba",
+  "create_tx": "e7213c140969edfbdb08ea80d076dd083228d2ba7546346171f970d08bf0e74f"
+}

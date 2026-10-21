@@ -11,6 +11,10 @@ that candidate on Soroban today, with StarkWare's open-source prover and Stellar
 
 Status: working on Stellar testnet. It is a demo and has not been audited.
 
+A second prototype, `contracts/recovery`, recovers an Ed25519 account from its seed after Stellar
+stops accepting Ed25519 signatures, with hashes only (see
+[Seed recovery](#seed-recovery-after-the-cutoff-prototype)).
+
 ## On testnet (protocol 29)
 
 Contract `CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG`
@@ -20,12 +24,16 @@ Contract `CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG`
 | compact | pow 24, blowup 2^8, 9 queries, fold 2^3 | 12,813 B | 45,418,055 | 11.4 % | 0.0107 XLM | [b5b83965…](https://stellar.expert/explorer/testnet/tx/b5b83965591a9976836447d418420b50974233152f5bfba13c01a29146712a92) |
 | standard (StarkWare's default for Stwo-Cairo) | pow 26, blowup 2, 70 queries | 71,701 B | 227,905,305 | 57.0 % | 0.0517 XLM | [b7fede74…](https://stellar.expert/explorer/testnet/tx/b7fede74f7b47178cc97f0124b95aded6bac7e235c79c0488a777f19f45a9a71) |
 | compact, one queried value changed | — | 12,813 B | — | — | — | [rejected](https://stellar.expert/explorer/testnet/tx/42d173ffb5e6c2f71941200d5bb6d565bd317e5969e25ee1417ac6599122ae7b) |
-| compact, twice the bits (192, on 19 October) | pow 24, blowup 2^8, 21 queries, fold 2^3 | 26,164 B | 77,707,666 | 19.4 % | 0.0093 XLM at the halved testnet rates | [d024ae8d…](https://stellar.expert/explorer/testnet/tx/d024ae8d4ef366353a1d204249175633cbf4b8a8a341421bee7925bf6b8d0aee) |
+| compact, twice the formula's bits (a cost test, see Caveats; 19 October) | pow 24, blowup 2^8, 21 queries, fold 2^3 | 26,164 B | 77,707,666 | 19.4 % | 0.0093 XLM at the halved testnet rates | [d024ae8d…](https://stellar.expert/explorer/testnet/tx/d024ae8d4ef366353a1d204249175633cbf4b8a8a341421bee7925bf6b8d0aee) |
 
 Both accepted proofs claim 96 bits of security by Stwo's formula, `pow_bits + log_blowup × queries`
-(see Caveats). Contract size: 126,650 bytes of the 131,072 allowed. The fees are from 13 October,
-when testnet charged mainnet's rates; testnet has since halved them (3 stroops per 10,000
-instructions instead of 7, and 203 per KB of transaction instead of 406).
+(see Caveats). Contract size: 126,650 bytes of the 131,072 allowed. Instruction counts throughout
+this README are as declared by simulation, which stellar-rpc pads a few percent above the metered
+use; the fees shown are the resource fee declared by simulation, and the fee actually charged runs a
+few percent lower (the [summary page](https://claude.ai/artifact/P8axyK8yQZT4QKuMdomCo6) shows
+charged fees). The fees are from 13 October, when testnet charged mainnet's rates; testnet has since
+halved them (3 stroops per 10,000 instructions instead of 7, and 203 per KB of transaction instead
+of 406).
 
 A second build, with Keccak from the host instead of Blake2s and more inlining (see below), is
 deployed as `CCHOM5ONNJVD3G4ECVG44MJHMHOWXYZXBFGW5PEDI2R5SV7I557PCIJ3` (129,372 bytes):
@@ -123,9 +131,10 @@ Blake2s compiled into the contract changes the cost by less than 1 % (43.2 M aga
 it makes the contract 6.6 KB smaller. That space buys inlining: Keccak through the host plus
 `opt-level = 3` for the two Stwo crates costs 34.0 M for the compact proof and 178.5 M for the
 default one in the local measurement, at 129,372 bytes (`KECCAK=1 ./scripts/build-contract.sh`).
-On testnet the same build takes 36.0 M and 188.2 M, 17–21 % less than the first build (the
-network also charges for loading the contract). Fees fall less, about 5–6 %, because for these
-proofs most of the fee pays for transaction size and history, not instructions.
+On testnet simulation declares the same build at 36.0 M and 188.2 M — a few percent above the local
+metered figure, which is the margin stellar-rpc adds to its estimate — still 17–21 % below the first
+build. Fees fall less, about 5–6 %, because for these proofs most of the fee pays for transaction
+size and history, not instructions.
 
 What would make STARK verification cheaper on Soroban, as input for protocol discussions:
 
@@ -138,14 +147,23 @@ What would make STARK verification cheaper on Soroban, as input for protocol dis
 
 ## Caveats
 
-- **Security level.** 96 bits is conjectured classical security, by the formula and defaults that
-  StarkWare's own prover uses for production (`security_bits = pow_bits + log_blowup_factor *
-  n_queries`, with pow 26, blowup 2 and 70 queries). Under the provable bounds currently known,
-  each query is worth about half its bits: roughly 60 bits for both configurations. See
-  [proven.provably.fast](https://github.com/starknet-innovation/proven.provably.fast). A quantum
-  attacker gets a quadratic (Grover-type) speedup on the brute-force parts, as with any hash-based
-  scheme, so a common allowance is to double the bits. The compact layout at 192 bits verifies on
-  testnet in 77.7 M instructions, 19.4 % of a transaction (table above).
+- **Security level.** 96 bits is what Stwo's formula gives for the parameters used
+  (`security_bits = pow_bits + log_blowup_factor * n_queries`): 24 + 8×9 for the compact layout,
+  26 + 1×70 for StarkWare's default. The formula assumes up-to-capacity proximity gaps for
+  Reed–Solomon codes, shown false in November 2025
+  ([Crites and Stewart, 2025/2046](https://eprint.iacr.org/2025/2046);
+  [Ben-Sasson et al., 2025/2055](https://eprint.iacr.org/2025/2055)). A corrected,
+  list-decoding-capacity conjecture costs little at these rates and field size: about 1 bit, so
+  ~95 (compact) and ~94 (standard). These counterexamples are for Reed–Solomon codes over prime
+  fields, not yet shown for the circle codes over QM31 that Stwo uses. What is *proven* today
+  reaches only the Johnson bound, each query worth about half its formula bits, so roughly 60 bits
+  for both layouts; that floor is untouched by the November result. A quantum attacker can grind
+  Fiat–Shamir challenges with Grover (Chiesa, Manohar and Spooner, TCC 2019), roughly halving each
+  term, so about 30 proven bits (the Merkle hash's collision resistance falls less far, to ~85).
+  Field-size terms cap every setting well below log2|QM31| ≈ 124 bits whatever the query count, and
+  a quantum attacker halves that too, so the formula's "192" (compact with 21 queries, 77.7 M
+  instructions, 19.4 % of a transaction, table above) is a cost test, not a security level; a
+  larger margin needs a larger field.
 - **No zero-knowledge.** Stwo proofs as used here are not zero-knowledge, so this proves public
   computations. It cannot protect a secret, such as a key behind a hash-based signature.
 - **One statement.** The contract verifies one AIR. Verifying arbitrary Cairo programs needs
@@ -154,6 +172,67 @@ What would make STARK verification cheaper on Soroban, as input for protocol dis
 - **Vendored Stwo.** StarkWare's crates are vendored with two manifest changes (see `PATCHES.md`).
   No Rust source was changed.
 - **Not audited.** Nothing here should secure funds.
+
+## Seed recovery after the cutoff (prototype)
+
+`contracts/recovery` tests a way to recover an Ed25519 account once Stellar stops accepting Ed25519
+signatures, with hashes only and no zero-knowledge proof. A Stellar secret key (S…) is the RFC 8032
+seed k, and the account key is A = [s]B with s = clamp(SHA-512(k)[0..32]). A quantum attacker who
+breaks A learns s but not k, so after the cutoff k still identifies the owner.
+
+1. `commit(C)`, at any time, before the cutoff too, with
+   C = SHA-256("stellar-seed-recovery-v0" ‖ network id ‖ A ‖ k ‖ SHA-256(new key)).
+2. `reveal(A, k, new key)` once the cutoff has passed and C is at least `delay` ledgers old. The
+   contract recomputes C, derives s from k and checks [s]B = A. The first reveal that passes
+   records the new key for A; later ones are refused.
+
+Whoever reads k — from the owner's own `reveal`, from the `simulateTransaction` a wallet or fee
+relayer runs, or from any later leak — can commit to it with their own key, but must then wait
+`delay` ledgers. The owner's commitment is already aged, so a prompt reveal wins. Unlike Fawkescoin
+and Stewart et al., where the earliest commitment wins, here the first valid reveal is final at
+once: no dispute window, but it assumes liveness — from the first time k leaves the wallet the owner
+has `delay` ledgers to land one transaction, so wallets should reveal as soon as the cutoff passes
+and through more than one relayer. `delay` must be sized for the cutoff surge and for validator
+censorship; "about a day" is a placeholder. A commitment made at least `delay` ledgers before the
+cutoff can be opened as soon as the cutoff passes. This is the commit–delay–reveal pattern of
+Fawkescoin (Bonneau and Miller, 2014) and Stewart et al. (ePrint 2018/213).
+
+The check [s]B = A uses the host's `ed25519_verify` instead of curve arithmetic in Wasm: the
+contract builds a signature with nonce point R = B, S = 1 + h·s mod L with
+h = SHA-512(B ‖ A ‖ C ‖ ctr) mod L. The host accepts it when [h]([s]B − A) = 0. `verify_strict`
+rejects a small-order A but not A plus an 8-torsion point, so the contract grinds the one-byte ctr
+until h is odd; an odd h kills no nonzero 2-, 4- or 8-torsion component, forcing [s]B = A exactly.
+It is the Ed25519 counterpart of Buterin's `ecrecover` trick on Ethereum. A host verifier that
+multiplied by the cofactor would break this check.
+
+On testnet (contract
+[`CBBGCPAY…`](https://stellar.expert/explorer/testnet/contract/CBBGCPAY2YG7N6KCTGYTNNF46GD4H7LRYW5YWTMQ2J3WG25TKUI4GZ36),
+delay 60 ledgers, 21 October 2026), with a thief who read the seed from the owner's pending reveal:
+
+| Step | CPU instructions (sim.) | Transaction size | Fee charged | Transaction |
+|---|---|---|---|---|
+| owner commits | 508,545 | 496 B | 0.0114 XLM | [5a125b7b…](https://stellar.expert/explorer/testnet/tx/5a125b7bf29a7df620b51af4ba4d9f1082ea7c53f1cbe063f87c4f3a58247ce4) |
+| thief commits with their own key | 508,545 | 496 B | 0.0114 XLM | [bb106661…](https://stellar.expert/explorer/testnet/tx/bb1066613bae769c5cb0246a6ed0d331f0760bcd9e41f86915f2c2afafa91fdf) |
+| thief reveals at once | refused: `TooEarly` (#2) | — | — | simulation |
+| owner reveals, 1,312-byte new key | 1,430,577 | 1,972 B | 0.0225 XLM | [296cb61b…](https://stellar.expert/explorer/testnet/tx/296cb61b56c69b7961ecbaad1c542b183da3ca829f9b3b51af5e7506c65a70a7) |
+| thief reveals after the delay | refused: `AlreadyRecovered` (#3) | — | — | simulation |
+
+The key check alone, declared by simulation on testnet: 1,097,592 instructions through
+`ed25519_verify`, 23,283,138 with Curve25519 compiled into the contract, about 21× more
+(`deployments/testnet-recovery-measure.json`; the Wasm figure uses curve25519-dalek without its
+precomputed tables). The tests in `contracts/recovery/tests` also cover the cutoff, a commitment
+made too close to it, copied commitments, wrong seeds and keys, network-id binding, a mixed-order A,
+and the case the scheme cannot help — an owner kept out for the whole delay loses. An earlier
+design, in which the earliest commitment wins during a dispute window after the reveal, was replaced
+by this first-valid-reveal rule, which leaves no window in which a recorded recovery can still
+change.
+
+The new key here is 1,312 random bytes, the size of an ML-DSA-44 public key; the contract stores
+only its SHA-256. The commitment, the `Recovered` record and the contract instance are persistent
+entries, so "commit at any time" means a years-old commitment may have to be restored before its
+reveal (archived persistent entries restore automatically since protocol 23, and cannot be
+recreated by anyone else). A real recovery of classic G… accounts would be a protocol rule, because
+a contract cannot change a classic account's signers. Fake seeds only.
 
 ## Reproduce
 
@@ -198,6 +277,13 @@ node scripts/demo.mjs testnet links
 
 # 7. Keep the testnet contracts live (they are archived 7 days after the last extension)
 node scripts/extend-ttl.mjs testnet --days=35 CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG
+
+# 8. Seed recovery prototype: tests, then testnet with fake seeds (logs to deployments/testnet-recovery*.json)
+./scripts/build-recovery.sh
+cargo test -p stwo-soroban-recovery --release -- --nocapture
+node scripts/recovery.mjs testnet deploy 60      # delay of 60 ledgers, cutoff = now
+node scripts/recovery.mjs testnet race           # owner, thief, about 10 minutes
+node scripts/recovery-measure.mjs testnet        # key check: host ed25519_verify vs Wasm
 ```
 
 ## Layout
@@ -207,8 +293,10 @@ crates/air            statement, AIR, envelope and verify_envelope (no_std, shar
 crates/prover         CLI: prove, tamper, inspect
 contracts/verifier    Soroban contract + tests that run the Wasm under Soroban metering
 contracts/demo        keeps proofs on chain so a short transaction can re-run a verification
+contracts/recovery    seed recovery after the Ed25519 cutoff, commit–delay–reveal (prototype)
 vendor/               StarkWare's stwo and stwo-constraint-framework 2.4.0 (Apache-2.0)
-scripts/              build-contract.sh, deploy.mjs, demo.mjs, extend-ttl.mjs
+scripts/              build-contract.sh, build-recovery.sh, deploy.mjs, demo.mjs, extend-ttl.mjs,
+                      recovery.mjs, recovery-measure.mjs
 deployments/          transactions sent, per network
 ```
 

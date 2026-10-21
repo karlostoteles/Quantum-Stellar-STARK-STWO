@@ -7,6 +7,7 @@ members = [
     "crates/prover",
     "contracts/verifier",
     "contracts/demo",
+    "contracts/recovery",
 ]
 
 # Used by the vendored StarkWare crates (they inherit these values).

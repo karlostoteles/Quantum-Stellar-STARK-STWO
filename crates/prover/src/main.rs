@@ -176,11 +176,55 @@ fn run() -> Result<(), String> {
             std::fs::write(out, &bytes).map_err(|e| format!("cannot write {out}: {e}"))?;
             println!("{}", serde_json::json!({ "file": out, "native_verify": format!("{native:?}") }));
         }
+        // Field operations and Blake2s hashes per verifier phase (needs --features op-count).
+        #[cfg(feature = "op-count")]
+        "count-ops" => {
+            use stwo::core::op_count;
+            let input = map.get("in").ok_or("--in is required")?;
+            let (bytes, env) = read_envelope(input)?;
+            op_count::start();
+            let result = verify_envelope(env);
+            op_count::checkpoint("rest");
+            let phases = op_count::take();
+            let names = op_count::NAMES;
+            let totals: Vec<u64> = (0..names.len()).map(|i| phases.iter().map(|(_, c)| c[i]).sum()).collect();
+            let rows: Vec<serde_json::Value> = phases
+                .iter()
+                .map(|(phase, counts)| {
+                    let mut o = serde_json::Map::new();
+                    o.insert("phase".into(), (*phase).into());
+                    for (n, c) in names.iter().zip(counts) {
+                        o.insert(n.to_lowercase(), (*c).into());
+                    }
+                    serde_json::Value::Object(o)
+                })
+                .collect();
+            let mut t = serde_json::Map::new();
+            for (n, c) in names.iter().zip(&totals) {
+                t.insert(n.to_lowercase(), (*c).into());
+            }
+            println!("{}", serde_json::to_string_pretty(&serde_json::json!({
+                "file": input, "proof_bytes": bytes.len(), "native_verify": format!("{result:?}"),
+                "phases": rows, "totals": t,
+            })).unwrap());
+        }
         "inspect" => {
             let input = map.get("in").ok_or("--in is required")?;
             let (bytes, env) = read_envelope(input)?;
             let mut s = summary(&env, bytes.len());
+            // Native verification time: median of 21 runs (decoding excluded).
+            let mut times: Vec<u128> = (0..21)
+                .map(|_| {
+                    let t = Instant::now();
+                    let r = verify_envelope(env.clone());
+                    let us = t.elapsed().as_micros();
+                    assert!(r.is_ok() || true);
+                    us
+                })
+                .collect();
+            times.sort();
             s["native_verify"] = format!("{:?}", verify_envelope(env)).into();
+            s["native_verify_us_median"] = (times[10] as u64).into();
             println!("{}", serde_json::to_string_pretty(&s).unwrap());
         }
         other => return Err(format!("unknown command '{other}'")),

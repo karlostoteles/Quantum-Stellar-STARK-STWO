@@ -26,6 +26,13 @@ parallel = ["rayon", "indexmap/rayon"]
 slow-tests = []
 # stwo-soroban patch: hash Keccak-256 through an external function (see PATCHES.md).
 host-keccak = []
+# stwo-soroban patch: count field operations and Blake2s hashes (see PATCHES.md).
+op-count = []
+# stwo-soroban patch: cheaper verifier (twiddle table, inlined field arithmetic, one-shot leaf
+# hashing). Changes no result, only cost; see PATCHES.md.
+fast = []
+# stwo-soroban patch: keeps a few verifier functions out of line so the profiler can see them.
+probe = []
 tracing = []
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

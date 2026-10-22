@@ -1,0 +1,94 @@
+{
+  "network": "testnet",
+  "events": [
+    {
+      "at": "2026-10-22T15:36:09.670Z",
+      "kind": "deploy",
+      "upload_tx": "ecba71b949bbdc713de5691b9788958424605d1ce54f22b124c43e1c46e58251",
+      "create_tx": "7638e113ebd85519daf8726633d9661d566f272536dd8ad969c24815ee01f824",
+      "contract": "CDSF6RMU7BDO57RKOUHI2LJAQLWFBMSKRW2YJYSMO34WSOJBBCWC2EOD",
+      "wasm_bytes": 117225
+    },
+    {
+      "at": "2026-10-22T15:36:27.617Z",
+      "kind": "verify",
+      "proof": "proofs/compact.bin",
+      "proof_bytes": 12813,
+      "tx": "24590bb08edfb95f7d8a0965eae26d0b7e8b66a80c0fa89c33bedd3d2b15d669",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 13168,
+      "ledger": 5331960,
+      "instructions": 18598641,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 43046,
+      "min_resource_fee_stroops": 43046,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 4,
+        "proof_sha256": "97062f689e7f3b1d518d6a421aa729ff1658901f03c5b38805086b73bc70e98d",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-22T15:36:33.598Z",
+      "kind": "verify",
+      "proof": "proofs/standard.bin",
+      "proof_bytes": 71701,
+      "tx": "20532f2349899494c2ff4effe571d8747b72eb1f44d22504f41bcabf80d77869",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 72056,
+      "ledger": 5331961,
+      "instructions": 106500079,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 210610,
+      "min_resource_fee_stroops": 210610,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 10,
+        "proof_sha256": "054ef83c1263ce35e76ed9b2a81caf34275a78f6eee4a339957e66fca32e1014",
+        "security_bits": 96
+      }
+    },
+    {
+      "at": "2026-10-22T15:36:53.082Z",
+      "kind": "verify",
+      "proof": "proofs/compact-192.bin",
+      "proof_bytes": 26164,
+      "tx": "16fd3264dcfb706e0571e441ff46ae3470a8e41e9346d11646711620e86bcb10",
+      "status": "SUCCESS",
+      "tx_envelope_bytes": 26516,
+      "ledger": 5331965,
+      "instructions": 33683628,
+      "disk_read_bytes": 0,
+      "write_bytes": 0,
+      "resource_fee_stroops": 79576,
+      "min_resource_fee_stroops": 79576,
+      "result": {
+        "a0": 1,
+        "a1": 3141592,
+        "last": 1476137047,
+        "log_n_rows": 4,
+        "proof_sha256": "38817330e05f319efc97af216294701783dd5db6a3910b310c1fd4c31926fc1a",
+        "security_bits": 192
+      }
+    },
+    {
+      "at": "2026-10-22T15:37:08.513Z",
+      "kind": "reject",
+      "proof": "proofs/compact-bad-proof.bin",
+      "proof_bytes": 12813,
+      "tx": "2f9367889901e4a200965ccbc3d031e089a1a7f802da1babe1341ecfd9937439",
+      "status": "FAILED",
+      "ledger": 5331966
+    }
+  ],
+  "contract": "CDSF6RMU7BDO57RKOUHI2LJAQLWFBMSKRW2YJYSMO34WSOJBBCWC2EOD",
+  "wasm_sha256": "05371365f77c7c9d0bff211eaf96eb850c09309ea9b9393e1b20996d34b4e94a",
+  "wasm_bytes": 117225
+}

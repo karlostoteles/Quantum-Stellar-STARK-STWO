@@ -44,6 +44,20 @@ deployed as `CCHOM5ONNJVD3G4ECVG44MJHMHOWXYZXBFGW5PEDI2R5SV7I557PCIJ3` (129,372 
 | standard (Keccak) | 71,245 B | 188,249,851 | 47.1 % | −17.4 % | [e6e62ee2…](https://stellar.expert/explorer/testnet/tx/e6e62ee2190826c4810a4e83987ec32496360eae2d0711b3423baced29e09933) |
 | compact (Keccak), one queried value changed | 12,875 B | — | — | — | [rejected](https://stellar.expert/explorer/testnet/tx/fadf3a889b9a0401f23c78ee42d92a5c8ee2272da7b33be913f29026d207abff) |
 
+A third build, the **`fast` verifier** (same proofs, same results, cheaper code: see
+[Where the cost goes](#where-the-cost-goes) and `PATCHES.md` change 6), is deployed as
+`CDSF6RMU7BDO57RKOUHI2LJAQLWFBMSKRW2YJYSMO34WSOJBBCWC2EOD` (117,225 bytes, 22 October, live until
+about 26 November):
+
+| Proof | Proof size | CPU instructions | Share of the 400 M tx limit | Against the first build | Transaction |
+|---|---|---|---|---|---|
+| compact (fast) | 12,813 B | 18,598,641 | 4.6 % | −59.1 % | [24590bb0…](https://stellar.expert/explorer/testnet/tx/24590bb08edfb95f7d8a0965eae26d0b7e8b66a80c0fa89c33bedd3d2b15d669) |
+| standard (fast) | 71,701 B | 106,500,079 | 26.6 % | −53.3 % | [20532f23…](https://stellar.expert/explorer/testnet/tx/20532f2349899494c2ff4effe571d8747b72eb1f44d22504f41bcabf80d77869) |
+| compact, 21 queries (fast) | 26,164 B | 33,683,628 | 8.4 % | −56.7 % | [16fd3264…](https://stellar.expert/explorer/testnet/tx/16fd3264dcfb706e0571e441ff46ae3470a8e41e9346d11646711620e86bcb10) |
+| compact, one queried value changed (fast) | 12,813 B | — | — | — | [rejected](https://stellar.expert/explorer/testnet/tx/2f9367889901e4a200965ccbc3d031e089a1a7f802da1babe1341ecfd9937439) |
+
+Resource fees declared by simulation at testnet's halved rates: 0.0043, 0.0211 and 0.0080 XLM.
+
 ### Run it yourself
 
 `contracts/demo` (`CDD4QZ6ULNZ57EWVQEKWR7RIQERSAADGRBW3LGLQ2M2MBJCRY76H4QRB`) keeps proofs on
@@ -96,17 +110,43 @@ stwo-soroban-prover prove ──► proof envelope (postcard: claim + FRI parame
 
 ## Where the cost goes
 
-Almost all of it (99 %) is Wasm execution (`WasmInsnExec`). Host-side costs such as memory,
-SHA-256 of the proof and instantiation are small. Two things decide the bill:
+Almost all of it (98 %) is Wasm execution (`WasmInsnExec`); the rest is the host's SHA-256 of the
+proof (0.7 M), memory and instantiation. Measured with the host's own metering
+(soroban-env-host 29.0.1) on the deployed contract code, with a per-function fuel profiler and a
+phase-by-phase build (`profiling/`, full tables in [`profiling/results/REPORT.md`](profiling/results/REPORT.md)):
 
-1. **Wasm function calls.** Soroban's calibrated fuel model charges 67 fuel for each `call`,
-   against 1 for most instructions, so inlining matters. For the compact proof, the same verifier
-   costs about 106 M instructions built at `opt-level = "z"` and 43 M at `"s"`. It would cost about
-   31 M at `3`, but the contract would then be 148 KB, which is over the limit. Building at `"s"` fits only because
-   `-Zbuild-std` with `panic=immediate-abort`, `-Zlocation-detail=none` and `-Zfmt-debug=none`
-   drop the panic and formatting code.
-2. **Queries, columns and tree depth.** Measured locally with Soroban's own metering
-   (`cargo test … measure`):
+| Phase | compact (43.1 M) | standard (216.6 M) |
+|---|---|---|
+| decoding the proof (postcard) | 8.0 % | 7.7 % |
+| component setup (constraint-framework info pass) | 9.7 % | 1.9 % |
+| OODS point, mask points, composition evaluation | 11.8 % | 2.4 % |
+| transcript (mix sampled values, FRI commit, proofs of work, queries) | 4.5 % | 1.4 % |
+| Merkle paths of the trace and composition trees | 18.2 % | 19.4 % |
+| quotients at the queried points (`fri_answers`) | 21.5 % | 12.7 % |
+| FRI layers: Merkle paths and folding | 25.9 % | 54.4 % |
+
+By kind of code (self fuel of each function; inlined code counts for its caller): Blake2s 13 % / 21 %,
+field-arithmetic functions 22 % / 15 %, memcpy/memset/allocation 22 % / 18 %, Merkle verifier logic
+9 % / 14 %, twiddle and domain-point computation 9 % / 13 %, verifier glue 14 % / 12 %.
+
+Four things decide the bill:
+
+1. **Wasm function calls.** Soroban charges 67 fuel for each `call` against 1 for most instructions;
+   that charge alone is 32 % of the compact verification and 28 % of the standard one (measured by
+   zeroing every other weight). wasmi charges a block's fuel when the block is entered, so a third
+   (compact) to almost half (standard) of the charged calls never execute. Inlining matters
+   accordingly: the same verifier costs about 106 M instructions built at `opt-level = "z"`, 43 M at
+   `"s"` and about 31 M at `3`, but at `3` the contract is 148 KB, over the limit. Building at `"s"` fits only because `-Zbuild-std` with
+   `panic=immediate-abort`, `-Zlocation-detail=none` and `-Zfmt-debug=none` drop the panic and
+   formatting code.
+2. **Field arithmetic is cheap, the calls around it are not.** An M31 multiply costs 7 fuel inline;
+   a CM31 multiply is a function call (102 fuel in situ, 67 of them the call), and a QM31 multiply
+   costs 1,006 fuel through its six calls. The compact proof executes 62,035 M31 multiplies,
+   1,575 QM31 multiplies and 83 M31 inversions; the standard one 276,951, 2,149 and 433.
+3. **Twiddles are recomputed.** The verifier derives every FRI twiddle and quotient domain point with
+   a scalar multiplication on the circle (5,300 fuel each, 246 times for the compact proof, 1,250
+   for the standard one): 12 % and 20 % of the cost, and a `TODO` in Stwo's own source.
+4. **Queries, columns and tree depth.** Measured locally (`cargo test … measure`):
 
 | Rows | Parameters | Proof | Instructions |
 |---|---|---|---|
@@ -116,34 +156,69 @@ SHA-256 of the proof and instantiation are small. Two things decide the bill:
 | 2^10 | blowup 2^4, 18 queries | 27.8 KB | 84.4 M |
 | 2^10 | blowup 2, 70 queries (default) | 71.7 KB | 216.6 M |
 
-For the compact proof, the 43.1 M break down roughly as follows:
+Each extra FRI query costs about 2.5 M at the compact layout (going from 9 to 21 queries adds
+30.6 M) and each extra trace column about 0.17 M with 9 queries.
 
-- decoding the proof: 3.6 M (16.8 M for the 72 KB default proof);
-- each extra FRI query: about 2.5 M at this layout (going from 9 to 21 queries adds 30.6 M), most
-  of it opening the 100 trace columns at the queried point and checking their Merkle paths;
-- each extra trace column: about 0.17 M with 9 queries (100 columns down to 50 saves 8.7 M);
-- the rest, about 16 M by linear extrapolation, does not depend on the number of queries: mostly
-  small field operations and function calls (evaluating the constraints at a random point, the
-  transcript, the last FRI layer).
+Hashing through the host does not help by itself: routing every hash through `keccak256` instead of
+Blake2s compiled into the contract changes the cost by less than 1 % (43.2 M against 43.1 M), and the
+model agrees (a 64-byte `sha256` through the host costs 17,402 instructions all included, a
+one-block Blake2s hash in Wasm about 16,700). The Keccak build does make the contract 6.6 KB smaller, and that space
+buys inlining: Keccak through the host plus `opt-level = 3` for the two Stwo crates costs 34.0 M for
+the compact proof and 178.5 M for the default one in the local measurement, at 129,372 bytes
+(`KECCAK=1 ./scripts/build-contract.sh`). On testnet simulation declares the same build at 36.0 M
+and 188.2 M, 17–21 % below the first build. Fees fall less, about 5–6 %, because for these proofs
+most of the fee pays for transaction size and history, not instructions.
 
-Hashing is not the bottleneck. Routing every hash through the host's `keccak256` instead of
-Blake2s compiled into the contract changes the cost by less than 1 % (43.2 M against 43.1 M), though
-it makes the contract 6.6 KB smaller. That space buys inlining: Keccak through the host plus
-`opt-level = 3` for the two Stwo crates costs 34.0 M for the compact proof and 178.5 M for the
-default one in the local measurement, at 129,372 bytes (`KECCAK=1 ./scripts/build-contract.sh`).
-On testnet simulation declares the same build at 36.0 M and 188.2 M — a few percent above the local
-metered figure, which is the margin stellar-rpc adds to its estimate — still 17–21 % below the first
-build. Fees fall less, about 5–6 %, because for these proofs most of the fee pays for transaction
-size and history, not instructions.
+### The `fast` build: the verifier tuned, no protocol change
 
-What would make STARK verification cheaper on Soroban, as input for protocol discussions:
+Feature `fast` (`FAST=1 ./scripts/build-contract.sh`; `PATCHES.md` change 6) keeps the proof
+format, the transcript and every check, and changes only how the verifier computes: FRI twiddles
+come from a 1 KB compile-time table and by stepping along the coset instead of a scalar
+multiplication per butterfly, with the inversions batched; the small field operations are inlined;
+Merkle nodes are hashed in one compression and leaves in one update; the Merkle verifier, the
+quotients and the FRI folds drop their hash maps, sorts, clones and per-query allocations (the
+quotients are also factored per sample point, so a query costs one QM31×M31 multiply per column);
+the component is written by hand instead of running the constraint framework's info pass at run
+time; and the contract is built with the `bulk-memory` target feature, so `memcpy` is one
+`memory.copy` (Soroban's wasmi enables bulk memory, and testnet accepted the contract). Same
+proofs accepted, same tampered proofs rejected; the Blake2s path is tested against the `blake2`
+crate.
 
-- **M31/QM31 field arithmetic in the host.** Most of the cost is small field operations and the
-  calls around them.
-- **A larger contract size limit**, so verifiers can be built with full inlining (about −30 %).
-- **A cheaper Wasm `call`** in the fuel model (67 fuel today).
-- A hash host function (Blake2s, or a Merkle-path check) would help little, judging by the
-  Keccak measurement above.
+| Proof | first build | `fast` build | change | Wasm calls | fuel on `call` | native (x86 2.8 GHz) |
+|---|---|---|---|---|---|---|
+| compact | 43.1 M | 17.3 M | −60 % | 32,595 → 4,007 | 32 % → 17 % | 224 → 178 µs |
+| standard | 216.6 M | 99.8 M | −54 % | 121,512 → 17,953 | 28 % → 15 % | 1,246 → 766 µs |
+| compact, 21 queries | 73.7 M | 31.4 M | −57 % | 48,641 → 5,991 | 31 % → 15 % | 398 → 250 µs |
+
+By phase (compact): decoding 0.84 M → 0.80 M fuel (now 19 % of the total), component setup
+1.02 M → 0.008 M, OODS and mask points 0.60 M → 0.07 M, composition 0.65 M → 0.24 M, Merkle paths of
+the trace trees 1.92 M → 1.02 M, quotients 2.27 M → 0.75 M, FRI layers 2.74 M → 1.03 M. What is left
+is mostly Blake2s (31 % of the compact bill, 42 % of the standard one: the compression function
+itself, 3,024 fuel per block, cannot get cheaper from inside Wasm), the proof decoding (postcard
+reads hashes byte by byte; a flat format would cut most of its 19 %), and the remaining `call`
+charges.
+
+### What would make STARK verification cheaper on Soroban
+
+Estimated from the profile (`profiling/model.py`); savings against the first build (43.1 M compact /
+216.6 M standard) and, where it still applies, against the `fast` build (17.3 M / 99.8 M):
+
+| Lever | vs first build | vs `fast` build | Who |
+|---|---|---|---|
+| verifier engineering (the `fast` build, measured) | −60 % / −54 % | — | the verifier |
+| `call` charged 1 fuel instead of 67 (exact) | −31 % / −28 % | −16 % / −15 % | protocol: fuel model |
+| Merkle-path verification host function with the hash inside (Blake2s priced like SHA-256; at half that price: −28 % / −42 % on `fast`) | −22 % / −40 % | −21 % / −32 % | protocol: new host function |
+| hash host function over many inputs per call | −7 % / −11 % | −15 % / −20 % | protocol |
+| contract size limit that fits `opt-level = 3` (measured on the first build) | −28 % / n/a | small: `fast` already inlines what matters | protocol: config |
+| quotient accumulation as one host call per query (upper bound) | −21 % / −12 % | −17 % / −8 % | protocol |
+| hash host function called once per hash | 0 % | 0 % | — |
+| per-element M31/QM31 host functions with today's ABI (`bn254_fr_mul` costs 12,842 per call, a QM31 multiply in Wasm 4,424) | +31 % / +8 % | worse | — |
+| the whole verifier as a host function (native time priced like ed25519) | −97 % | −94 % | protocol, premature |
+
+What holds in every combination: the field arithmetic itself is not where the money goes, the
+calls and the copying around it were, and most of that is the verifier's own business. The one
+host function that keeps its value after the verifier is tuned is Merkle-path verification with the
+hash inside, because a Blake2s compression costs 3,024 fuel in Wasm whatever the code around it.
 
 ## Caveats
 
@@ -170,7 +245,8 @@ What would make STARK verification cheaper on Soroban, as input for protocol dis
   StarkWare's recursion: the Cairo verifier alone compiles to 1.8 MB of Wasm, and a Cairo proof
   is 0.6–1 MB.
 - **Vendored Stwo.** StarkWare's crates are vendored with two manifest changes (see `PATCHES.md`).
-  No Rust source was changed.
+  The default build changes no Rust source; the `fast` and profiling builds add opt-in features
+  (`PATCHES.md`, changes 5–7).
 - **Not audited.** Nothing here should secure funds.
 
 ## Seed recovery after the cutoff (prototype)
@@ -263,6 +339,11 @@ node scripts/deploy.mjs testnet deploy
 node scripts/deploy.mjs testnet verify proofs/compact.bin
 node scripts/deploy.mjs testnet reject proofs/compact-bad-proof.bin
 
+# 4b. The fast verifier (same proofs; logs to deployments/testnet-fast.json)
+FAST=1 ./scripts/build-contract.sh
+VARIANT=fast node scripts/deploy.mjs testnet deploy
+VARIANT=fast node scripts/deploy.mjs testnet verify proofs/compact.bin
+
 # 5. Second build on testnet (logs to deployments/testnet-keccak.json)
 cargo build --release -p stwo-soroban-prover --features keccak   # then prove into proofs/keccak/
 KECCAK=1 ./scripts/build-contract.sh
@@ -278,7 +359,11 @@ node scripts/demo.mjs testnet links
 # 7. Keep the testnet contracts live (they are archived 7 days after the last extension)
 node scripts/extend-ttl.mjs testnet --days=35 CAUHDUJYMYIDUHMR4AH4TSHXYXLTCBDZSLKX7AW3R274VKAIJNHBX3QG
 
-# 8. Seed recovery prototype: tests, then testnet with fake seeds (logs to deployments/testnet-recovery*.json)
+# 8. Profiling: fuel by function, by phase and by instruction class; cost per operation (see profiling/README.md)
+./profiling/setup.sh && python3 profiling/run-all.py && python3 profiling/run-all.py --variant fast
+python3 profiling/report.py > profiling/results/REPORT.md && python3 profiling/model.py >> profiling/results/REPORT.md
+
+# 9. Seed recovery prototype: tests, then testnet with fake seeds (logs to deployments/testnet-recovery*.json)
 ./scripts/build-recovery.sh
 cargo test -p stwo-soroban-recovery --release -- --nocapture
 node scripts/recovery.mjs testnet deploy 60      # delay of 60 ledgers, cutoff = now
@@ -297,6 +382,8 @@ contracts/recovery    seed recovery after the Ed25519 cutoff, commit–delay–r
 vendor/               StarkWare's stwo and stwo-constraint-framework 2.4.0 (Apache-2.0)
 scripts/              build-contract.sh, build-recovery.sh, deploy.mjs, demo.mjs, extend-ttl.mjs,
                       recovery.mjs, recovery-measure.mjs
+profiling/            per-function fuel profiler (patched soroban-wasmi), phase and micro-benchmark
+                      probes, results and the savings model
 deployments/          transactions sent, per network
 ```
 

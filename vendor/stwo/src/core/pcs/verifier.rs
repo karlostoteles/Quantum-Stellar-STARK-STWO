@@ -59,8 +59,18 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
         proof: CommitmentSchemeProof<MC::H>,
         channel: &mut MC::C,
     ) -> Result<(), VerificationError> {
+        #[cfg(not(feature = "fast"))]
         channel.mix_felts(&proof.sampled_values.clone().flatten_cols());
+        #[cfg(feature = "fast")]
+        {
+            // Same bytes as `flatten_cols`, without cloning the nested vectors.
+            let felts: Vec<SecureField> =
+                proof.sampled_values.iter().flatten().flatten().copied().collect();
+            channel.mix_felts(&felts);
+        }
         let random_coeff = channel.draw_secure_felt();
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("mix_sampled_values");
         let lifting_log_size = self.trees.last().unwrap().height;
         let bound =
             CirclePolyDegreeBound::new(lifting_log_size - self.config.fri_config.log_blowup_factor);
@@ -68,6 +78,8 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
         // FRI commitment phase on OODS quotients.
         let mut fri_verifier =
             FriVerifier::<MC>::commit(channel, self.config.fri_config, proof.fri_proof, bound)?;
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("fri_commit");
 
         // Verify proof of work.
         if !channel.verify_pow_nonce(self.config.fri_config.pow_bits, proof.proof_of_work) {
@@ -81,6 +93,8 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
             lifting_log_size,
             self.trees[0].height,
         );
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("pow_queries");
 
         // Build the query positions tree: the preprocessed tree needs a different treatment than
         // the other trees.
@@ -98,6 +112,7 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
                 .collect::<Vec<_>>(),
         );
         // Verify decommitments.
+        #[cfg(not(feature = "fast"))]
         self.trees
             .as_ref()
             .zip_eq(proof.decommitments)
@@ -109,6 +124,18 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
             .0
             .into_iter()
             .collect::<Result<(), _>>()?;
+        #[cfg(feature = "fast")]
+        for (((tree, decommitment), queried_values), query_positions) in self
+            .trees
+            .iter()
+            .zip(proof.decommitments.iter())
+            .zip(proof.queried_values.iter())
+            .zip(query_positions_tree.iter())
+        {
+            tree.verify_ref(query_positions, queried_values, decommitment)?;
+        }
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("merkle_trace_trees");
         // Answer FRI queries.
         let samples = sampled_points.zip_cols(proof.sampled_values).map_cols(
             |(sampled_points, sampled_values)| {
@@ -126,6 +153,8 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
             proof.queried_values,
             lifting_log_size,
         )?;
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("fri_answers");
 
         fri_verifier.decommit(fri_answers)?;
 

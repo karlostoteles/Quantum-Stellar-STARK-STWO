@@ -10,6 +10,8 @@ pub mod fields;
 mod fraction;
 pub use fraction::Fraction;
 pub mod fri;
+#[cfg(feature = "op-count")]
+pub mod op_count;
 pub mod pcs;
 pub mod poly;
 pub mod proof;

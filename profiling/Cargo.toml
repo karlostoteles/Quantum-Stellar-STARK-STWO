@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = ["profiler"]
+
+# soroban-wasmi with the per-function fuel profile (see patch-wasmi.py). Everything else is the
+# unmodified soroban-env-host 29.0.1 that the testutils Env uses, i.e. the network's metering.
+[patch.crates-io]
+soroban-wasmi = { path = "soroban-wasmi" }
+
+[profile.release]
+opt-level = 3
+debug = false

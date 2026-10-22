@@ -1,8 +1,12 @@
 use hashbrown::HashMap;
+#[cfg(not(feature = "fast"))]
 use hashbrown::hash_map::Entry;
+#[cfg(not(feature = "fast"))]
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std_shims::{Vec, vec};
+#[cfg(not(feature = "fast"))]
+use std_shims::vec;
+use std_shims::Vec;
 use thiserror::Error;
 
 use crate::core::ColumnVec;
@@ -104,6 +108,7 @@ impl<H: MerkleHasherLifted> MerkleVerifierLifted<H> {
     /// query. This means that the vector of queried values will contain redundancies: whenever
     /// two query positions map to the same index in a smaller column in the trace, the value at
     /// that index is sent twice.
+    #[cfg(not(feature = "fast"))]
     pub fn verify(
         &self,
         query_positions: &[usize],
@@ -196,6 +201,104 @@ impl<H: MerkleHasherLifted> MerkleVerifierLifted<H> {
             return Err(MerkleVerificationError::RootMismatch);
         }
 
+        Ok(())
+    }
+    /// stwo-soroban patch (`fast`): the same check with the same hashing order and witness order,
+    /// without the per-position allocations, hash map and sorts of the original: one scratch row for
+    /// the leaf values, two reused layer buffers, and sorting only when the positions are not
+    /// already strictly increasing (they are, in the verifier's own calls).
+    #[cfg(feature = "fast")]
+    pub fn verify(
+        &self,
+        query_positions: &[usize],
+        queried_values: ColumnVec<Vec<BaseField>>,
+        decommitment: MerkleDecommitmentLifted<H>,
+    ) -> Result<(), MerkleVerificationError> {
+        self.verify_ref(query_positions, &queried_values, &decommitment)
+    }
+
+    /// stwo-soroban patch (`fast`): [`Self::verify`] on borrowed inputs, so callers need not clone
+    /// the queried values and the witness.
+    #[cfg(feature = "fast")]
+    pub fn verify_ref(
+        &self,
+        query_positions: &[usize],
+        queried_values: &[Vec<BaseField>],
+        decommitment: &MerkleDecommitmentLifted<H>,
+    ) -> Result<(), MerkleVerificationError> {
+        if self.height == 0 {
+            return Ok(());
+        };
+        assert_eq!(queried_values.len(), self.column_log_sizes.len());
+        for values in queried_values.iter() {
+            assert_eq!(values.len(), query_positions.len());
+        }
+        let n_cols = queried_values.len();
+
+        // Column order: ascending log size, stable (same as sorting the columns themselves).
+        let mut order: Vec<usize> = (0..n_cols).collect();
+        if !self.column_log_sizes.windows(2).all(|w| w[0] <= w[1]) {
+            order.sort_by_key(|&c| self.column_log_sizes[c]);
+        }
+
+        // Query order: ascending position, duplicates checked for equal values and dropped.
+        let mut query_idx: Vec<usize> = (0..query_positions.len()).collect();
+        if !query_positions.windows(2).all(|w| w[0] < w[1]) {
+            query_idx.sort_by_key(|&i| query_positions[i]);
+            let mut deduped: Vec<usize> = Vec::with_capacity(query_idx.len());
+            for &i in &query_idx {
+                if let Some(&j) = deduped.last() {
+                    if query_positions[j] == query_positions[i] {
+                        for col in queried_values {
+                            assert_eq!(col[j], col[i]);
+                        }
+                        continue;
+                    }
+                }
+                deduped.push(i);
+            }
+            query_idx = deduped;
+        }
+
+        // Leaf hashes, in position order.
+        let mut row: Vec<BaseField> = Vec::with_capacity(n_cols);
+        let mut prev_layer: Vec<(usize, H::Hash)> = Vec::with_capacity(query_idx.len());
+        for &i in &query_idx {
+            row.clear();
+            for &c in &order {
+                row.push(queried_values[c][i]);
+            }
+            let mut hasher = H::default();
+            hasher.update_leaf(&row);
+            prev_layer.push((query_positions[i], hasher.finalize()));
+        }
+
+        let mut hash_witness = decommitment.hash_witness.iter().copied();
+        let mut curr_layer: Vec<(usize, H::Hash)> = Vec::with_capacity(prev_layer.len());
+        for _ in 0..self.height {
+            curr_layer.clear();
+            let mut k = 0;
+            while k < prev_layer.len() {
+                let (idx_0, hash_0) = prev_layer[k];
+                let children = if k + 1 < prev_layer.len() && prev_layer[k + 1].0 == idx_0 ^ 1 {
+                    k += 2;
+                    (hash_0, prev_layer[k - 1].1)
+                } else {
+                    k += 1;
+                    let witness =
+                        hash_witness.next().ok_or(MerkleVerificationError::WitnessTooShort)?;
+                    if idx_0 & 1 == 0 { (hash_0, witness) } else { (witness, hash_0) }
+                };
+                curr_layer.push((idx_0 >> 1, H::hash_children(children)));
+            }
+            core::mem::swap(&mut prev_layer, &mut curr_layer);
+        }
+        if hash_witness.next().is_some() {
+            return Err(MerkleVerificationError::WitnessTooLong);
+        }
+        if prev_layer.len() != 1 || prev_layer[0].1 != self.root {
+            return Err(MerkleVerificationError::RootMismatch);
+        }
         Ok(())
     }
 }

@@ -55,7 +55,9 @@ impl QM31 {
 
     // Note: Adding this as a Mul impl drives rust insane, and it tries to infer Qm31*Qm31 as
     // QM31*CM31.
+    #[cfg_attr(feature = "fast", inline(always))]
     pub fn mul_cm31(self, rhs: CM31) -> Self {
+        crate::op_count!(QM31_MUL_CM31);
         Self(self.0 * rhs, self.1 * rhs)
     }
 }
@@ -75,8 +77,10 @@ impl Debug for QM31 {
 impl Mul for QM31 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn mul(self, rhs: Self) -> Self::Output {
         // (a + bu) * (c + du) = (ac + rbd) + (ad + bc)u.
+        crate::op_count!(QM31_MUL);
         Self(self.0 * rhs.0 + R * self.1 * rhs.1, self.0 * rhs.1 + self.1 * rhs.0)
     }
 }
@@ -114,6 +118,7 @@ impl FieldExpOps for QM31 {
     fn inverse(&self) -> Self {
         assert!(!self.is_zero(), "0 has no inverse");
         // (a + bu)^-1 = (a - bu) / (a^2 - (2+i)b^2).
+        crate::op_count!(QM31_INV);
         let b2 = self.1.square();
         let ib2 = CM31(-b2.1, b2.0);
         let denom = self.0.square() - (b2 + b2 + ib2);

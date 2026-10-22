@@ -26,6 +26,7 @@ impl<const IS_M31_OUTPUT: bool> Hasher for Blake2sHasherGeneric<IS_M31_OUTPUT> {
 }
 
 impl MerkleHasherLifted for Blake2sMerkleHasher {
+    #[cfg(not(feature = "fast"))]
     fn hash_children(children_hashes: (Self::Hash, Self::Hash)) -> Self::Hash {
         let mut hasher = Self::default();
         let (left_child, right_child) = children_hashes;
@@ -35,7 +36,26 @@ impl MerkleHasherLifted for Blake2sMerkleHasher {
         hasher.finalize()
     }
 
+    /// stwo-soroban patch (`fast`): the same 64-byte hash in one compression.
+    #[cfg(feature = "fast")]
+    fn hash_children(children_hashes: (Self::Hash, Self::Hash)) -> Self::Hash {
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::blake2s_finalized(64);
+        let (left_child, right_child) = children_hashes;
+        Blake2sHash(crate::core::vcs::blake2_hash::fast_blake2s::hash_two(&left_child.0, &right_child.0))
+    }
+
+    #[cfg(not(feature = "fast"))]
     fn update_leaf(&mut self, column_values: &[BaseField]) {
+        column_values.iter().for_each(|x| self.update(&x.0.to_le_bytes()));
+    }
+
+    /// stwo-soroban patch (`fast`): the same bytes (little-endian u32s) in one update.
+    #[cfg(feature = "fast")]
+    fn update_leaf(&mut self, column_values: &[BaseField]) {
+        #[cfg(target_endian = "little")]
+        self.update(bytemuck::cast_slice(column_values));
+        #[cfg(not(target_endian = "little"))]
         column_values.iter().for_each(|x| self.update(&x.0.to_le_bytes()));
     }
 

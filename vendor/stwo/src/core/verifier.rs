@@ -83,6 +83,8 @@ pub fn verify_ex<MC: MerkleChannel>(
         return Err(VerificationError::OodsProofOfWork);
     }
     channel.mix_u64(proof.oods_proof_of_work);
+    #[cfg(feature = "op-count")]
+    crate::core::op_count::checkpoint("commitments_pow");
 
     // Draw OODS point.
     let oods_point = CirclePoint::<SecureField>::get_random_point(channel);
@@ -91,6 +93,8 @@ pub fn verify_ex<MC: MerkleChannel>(
         components.mask_points(oods_point, max_log_degree_bound, include_all_preprocessed_columns);
     // Add the composition polynomial mask points.
     sample_points.push(vec![vec![oods_point]; 2 * SECURE_EXTENSION_DEGREE]);
+    #[cfg(feature = "op-count")]
+    crate::core::op_count::checkpoint("oods_mask_points");
 
     let sample_points_by_column = sample_points.as_cols_ref().flatten();
     tracing::info!("Sampling {} columns.", sample_points_by_column.len());
@@ -115,6 +119,8 @@ pub fn verify_ex<MC: MerkleChannel>(
     {
         return Err(VerificationError::OodsNotMatching);
     }
+    #[cfg(feature = "op-count")]
+    crate::core::op_count::checkpoint("composition_eval");
     commitment_scheme.verify_values(sample_points, proof.0, channel)
 }
 

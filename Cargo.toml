@@ -9,6 +9,8 @@ members = [
     "contracts/demo",
     "contracts/recovery",
 ]
+# The fuel profiler (profiling/) is its own workspace: it patches soroban-wasmi.
+exclude = ["profiling"]
 
 # Used by the vendored StarkWare crates (they inherit these values).
 [workspace.package]
@@ -58,6 +60,17 @@ codegen-units = 1
 panic = "abort"
 strip = "symbols"
 overflow-checks = false
+
+# The cheaper verifier (feature `fast`, PATCHES.md change 6), built by FAST=1 ./scripts/build-contract.sh
+# with the bulk-memory target feature (memory.copy/fill, which Soroban's wasmi accepts).
+[profile.contract-fast]
+inherits = "contract"
+
+# Same code as "contract" with the function names kept, for profiling/ (the name section does not
+# change the code or its cost; it only makes the contract too large to deploy).
+[profile.contract-named]
+inherits = "contract"
+strip = "none"
 
 # Variant measured on 2026-10-14: Keccak-256 through the host plus opt-level 3 for the Stwo crates.
 # About 20 % cheaper to verify, 129,372 bytes (1.7 KB under the limit). Build it with

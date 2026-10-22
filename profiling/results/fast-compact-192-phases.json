@@ -1,0 +1,89 @@
+{
+ "phases": [
+  "decode",
+  "setup_component",
+  "commit_trace_trees",
+  "oods_pow_and_point",
+  "composition_eval",
+  "mix_sampled_values",
+  "fri_commit",
+  "fri_pow_and_queries",
+  "merkle_trace_trees",
+  "fri_answers",
+  "fri_decommit"
+ ],
+ "cumulative": [
+  {
+   "ok": true,
+   "cpu": 6238043,
+   "fuel": 1469503,
+   "calls": 1064
+  },
+  {
+   "ok": true,
+   "cpu": 6270119,
+   "fuel": 1477522,
+   "calls": 1083
+  },
+  {
+   "ok": true,
+   "cpu": 6380347,
+   "fuel": 1505079,
+   "calls": 1131
+  },
+  {
+   "ok": true,
+   "cpu": 6679223,
+   "fuel": 1579798,
+   "calls": 1416
+  },
+  {
+   "ok": true,
+   "cpu": 7620063,
+   "fuel": 1815008,
+   "calls": 1740
+  },
+  {
+   "ok": true,
+   "cpu": 8671137,
+   "fuel": 2075620,
+   "calls": 2155
+  },
+  {
+   "ok": true,
+   "cpu": 8817213,
+   "fuel": 2112139,
+   "calls": 2221
+  },
+  {
+   "ok": true,
+   "cpu": 9038413,
+   "fuel": 2167439,
+   "calls": 2345
+  },
+  {
+   "ok": true,
+   "cpu": 17724773,
+   "fuel": 4339029,
+   "calls": 3573
+  },
+  {
+   "ok": true,
+   "cpu": 21767245,
+   "fuel": 5349647,
+   "calls": 4410
+  },
+  {
+   "ok": true,
+   "cpu": 31082923,
+   "fuel": 7676410,
+   "calls": 7264
+  }
+ ],
+ "verify_probe_build": {
+  "ok": true,
+  "cpu": 32084851,
+  "fuel": 7562628,
+  "calls": 6688
+ }
+}

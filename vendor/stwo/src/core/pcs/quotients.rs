@@ -77,6 +77,7 @@ impl ColumnSampleBatch {
     /// Groups column samples by sampled point.
     /// # Arguments
     /// samples: For each column, a vector of samples.
+    #[cfg_attr(feature = "probe", inline(never))]
     pub fn new_vec(samples_with_rand: &[&Vec<(PointSample, SecureField)>]) -> Vec<Self> {
         // Group samples by point, and create a ColumnSampleBatch for each point.
         // This should keep a stable ordering.
@@ -114,6 +115,7 @@ pub struct PointSample {
 /// * f̃ᵢ is the lift of the trace poly fᵢ to the domain of maximal log size.
 /// * (a(i, z), b(i, z), c(i, z)) are the coefficients of the line equation `cY - aX - b` through
 ///   (z.y, f̃ᵢ(z)), (conj(z.y), conj(f̃ᵢ(z)).
+#[cfg(not(feature = "fast"))]
 pub fn fri_answers(
     column_log_sizes: TreeVec<Vec<u32>>,
     samples: TreeVec<Vec<Vec<PointSample>>>,
@@ -148,6 +150,113 @@ pub fn fri_answers(
             &quotient_constants,
             domain_point,
         ));
+    }
+    Ok(res)
+}
+
+/// stwo-soroban patch (`fast`): the same quotients, factored per sample batch. For a batch at point
+/// z with line coefficients (αᵢaᵢ, αᵢbᵢ, αᵢc) (see [complex_conjugate_line_coeffs]; `c` depends only
+/// on z), the numerator Σᵢ αᵢ(c·vᵢ − aᵢ·y − bᵢ) equals c·Σᵢαᵢvᵢ − y·Σᵢαᵢaᵢ − Σᵢαᵢbᵢ, so A = Σαᵢaᵢ
+/// and B = Σαᵢbᵢ are computed once and each query costs one QM31×M31 multiply per column. Field
+/// arithmetic is exact, so the values are identical to the original's. No per-query allocations.
+#[cfg(feature = "fast")]
+#[cfg_attr(feature = "probe", inline(never))]
+pub fn fri_answers(
+    column_log_sizes: TreeVec<Vec<u32>>,
+    samples: TreeVec<Vec<Vec<PointSample>>>,
+    random_coeff: SecureField,
+    query_positions: &[usize],
+    queried_values: TreeVec<ColumnVec<Vec<BaseField>>>,
+    lifting_log_size: u32,
+) -> Result<Vec<SecureField>, VerificationError> {
+    use crate::core::fields::ComplexConjugate;
+    use crate::core::fields::FieldExpOps;
+    let queried_values = queried_values.flatten();
+    assert!(
+        queried_values.iter().all(|queries_per_col| queries_per_col.len() == query_positions.len())
+    );
+    let lifting_domain = CanonicCoset::new(lifting_log_size).circle_domain();
+
+    // The same samples, random-coefficient powers and periodicity samples as
+    // `build_samples_with_randomness_and_periodicity`, in the same order, grouped by point in order
+    // of first appearance as `ColumnSampleBatch::new_vec` does, without the hash map and the
+    // per-column vectors.
+    let lifting_domain_generator = CanonicCoset::new(lifting_log_size).step();
+    let mut sample_batches: Vec<ColumnSampleBatch> = Vec::new();
+    let mut random_pow = SecureField::one();
+    let mut column_index = 0usize;
+    let mut push = |point: CirclePoint<SecureField>, value: SecureField, column_index: usize, random_pow: SecureField| {
+        let data = NumeratorData { column_index, sample_value: value, random_coeff: random_pow };
+        match sample_batches.iter_mut().find(|b| b.point == point) {
+            Some(batch) => batch.cols_vals_randpows.push(data),
+            None => sample_batches.push(ColumnSampleBatch { point, cols_vals_randpows: Vec::from([data]) }),
+        }
+    };
+    for (samples_per_tree, sizes_per_tree) in samples.iter().zip(column_log_sizes.0.iter()) {
+        for (samples_per_col, &log_size) in samples_per_tree.iter().zip(sizes_per_tree.iter()) {
+            if !samples_per_col.is_empty() {
+                if let [_prev, point_sample] = &samples_per_col[..] {
+                    let period_generator = lifting_domain_generator.repeated_double(log_size);
+                    push(point_sample.point.add(period_generator.into_ef()), point_sample.value, column_index, random_pow);
+                    random_pow *= random_coeff;
+                }
+                for sample in samples_per_col {
+                    push(sample.point, sample.value, column_index, random_pow);
+                    random_pow *= random_coeff;
+                }
+            }
+            column_index += 1;
+        }
+    }
+
+    // Per batch: c, A = Σ αᵢ aᵢ, B = Σ αᵢ bᵢ, and the columns with their αᵢ.
+    struct Batch {
+        point: CirclePoint<SecureField>,
+        c: SecureField,
+        a_sum: SecureField,
+        b_sum: SecureField,
+    }
+    let batches: Vec<Batch> = sample_batches
+        .iter()
+        .map(|batch| {
+            let z = batch.point;
+            assert_ne!(z.y, z.y.complex_conjugate(), "Cannot evaluate a line with a single point ({:?}).", z);
+            let c = z.complex_conjugate().y - z.y;
+            let mut a_sum = SecureField::zero();
+            let mut b_sum = SecureField::zero();
+            for NumeratorData { sample_value, random_coeff, .. } in &batch.cols_vals_randpows {
+                let a = sample_value.complex_conjugate() - *sample_value;
+                let b = *sample_value * c - a * z.y;
+                a_sum += *random_coeff * a;
+                b_sum += *random_coeff * b;
+            }
+            Batch { point: z, c, a_sum, b_sum }
+        })
+        .collect();
+
+    let mut denominators: Vec<CM31> = (0..batches.len()).map(|_| CM31::zero()).collect();
+    let mut denominator_inverses: Vec<CM31> = denominators.clone();
+    let mut res = Vec::with_capacity(query_positions.len());
+    for (idx, position) in query_positions.iter().enumerate() {
+        let domain_point = lifting_domain.at(bit_reverse_index(*position, lifting_log_size));
+        for (d, batch) in denominators.iter_mut().zip(&batches) {
+            let z = batch.point;
+            // Same expression as `denominator_inverses`: (Re(zₓ) − x)·Im(z_y) − (Re(z_y) − y)·Im(zₓ).
+            *d = (z.x.0 - domain_point.x) * z.y.1 - (z.y.0 - domain_point.y) * z.x.1;
+        }
+        CM31::batch_inverse(&denominators, &mut denominator_inverses);
+        let mut row_accumulator = SecureField::zero();
+        for ((batch, sample_batch), denominator_inverse) in
+            batches.iter().zip(&sample_batches).zip(&denominator_inverses)
+        {
+            let mut v_sum = SecureField::zero();
+            for NumeratorData { column_index, random_coeff, .. } in &sample_batch.cols_vals_randpows {
+                v_sum += *random_coeff * queried_values[*column_index][idx];
+            }
+            let numerator = batch.c * v_sum - batch.a_sum * domain_point.y - batch.b_sum;
+            row_accumulator += numerator.mul_cm31(*denominator_inverse);
+        }
+        res.push(row_accumulator);
     }
     Ok(res)
 }
@@ -273,6 +382,7 @@ pub struct QuotientConstants {
 ///
 /// This function currently assumes flat AIRs and adds periodicity checks only for columns with two
 /// samples.
+#[cfg_attr(feature = "probe", inline(never))]
 pub fn build_samples_with_randomness_and_periodicity(
     samples: &TreeVec<Vec<Vec<PointSample>>>,
     column_log_sizes: Vec<impl Iterator<Item = u32>>,

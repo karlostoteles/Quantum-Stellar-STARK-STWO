@@ -108,6 +108,7 @@ impl<F: Zero + Add<Output = F> + FieldExpOps + Sub<Output = F> + Neg<Output = F>
 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn add(self, rhs: Self) -> Self::Output {
         let x = self.x.clone() * rhs.x.clone() - self.y.clone() * rhs.y.clone();
         let y = self.x * rhs.y + self.y * rhs.x;
@@ -193,6 +194,60 @@ pub const SECURE_FIELD_CIRCLE_GEN: CirclePoint<SecureField> = CirclePoint {
 /// Order of [SECURE_FIELD_CIRCLE_GEN].
 pub const SECURE_FIELD_CIRCLE_ORDER: u128 = P4 - 1;
 
+/// stwo-soroban patch (`fast`): `TWIDDLE_TABLE[w][d] = M31_CIRCLE_GEN * (d << (4 * w))`, built at
+/// compile time (1 KB in the data segment). `CirclePointIndex::to_point` sums one entry per digit.
+#[cfg(feature = "fast")]
+const TWIDDLE_WINDOW_BITS: u32 = 4;
+#[cfg(feature = "fast")]
+const TWIDDLE_WINDOW_SIZE: usize = 1 << TWIDDLE_WINDOW_BITS;
+#[cfg(feature = "fast")]
+const TWIDDLE_WINDOWS: usize = M31_CIRCLE_LOG_ORDER.div_ceil(TWIDDLE_WINDOW_BITS) as usize;
+#[cfg(feature = "fast")]
+static TWIDDLE_TABLE: [[CirclePoint<M31>; TWIDDLE_WINDOW_SIZE]; TWIDDLE_WINDOWS] = build_twiddle_table();
+
+#[cfg(feature = "fast")]
+const fn const_point_add(p: CirclePoint<M31>, q: CirclePoint<M31>) -> CirclePoint<M31> {
+    use super::fields::m31::P;
+    const fn mul(a: u32, b: u32) -> u32 {
+        M31::reduce((a as u64) * (b as u64)).0
+    }
+    const fn add(a: u32, b: u32) -> u32 {
+        let s = a + b;
+        if s >= P { s - P } else { s }
+    }
+    const fn sub(a: u32, b: u32) -> u32 {
+        add(a, P - b)
+    }
+    CirclePoint {
+        x: M31::from_u32_unchecked(sub(mul(p.x.0, q.x.0), mul(p.y.0, q.y.0))),
+        y: M31::from_u32_unchecked(add(mul(p.x.0, q.y.0), mul(p.y.0, q.x.0))),
+    }
+}
+
+#[cfg(feature = "fast")]
+const fn build_twiddle_table() -> [[CirclePoint<M31>; TWIDDLE_WINDOW_SIZE]; TWIDDLE_WINDOWS] {
+    let identity = CirclePoint { x: M31::from_u32_unchecked(1), y: M31::from_u32_unchecked(0) };
+    let mut table = [[identity; TWIDDLE_WINDOW_SIZE]; TWIDDLE_WINDOWS];
+    let mut base = M31_CIRCLE_GEN; // GEN * 2^(4w)
+    let mut w = 0;
+    while w < TWIDDLE_WINDOWS {
+        let mut acc = base;
+        let mut d = 1;
+        while d < TWIDDLE_WINDOW_SIZE {
+            table[w][d] = acc;
+            acc = const_point_add(acc, base);
+            d += 1;
+        }
+        let mut k = 0;
+        while k < TWIDDLE_WINDOW_BITS {
+            base = const_point_add(base, base);
+            k += 1;
+        }
+        w += 1;
+    }
+    table
+}
+
 /// Integer i that represent the circle point i * CIRCLE_GEN. Treated as an
 /// additive ring modulo `1 << M31_CIRCLE_LOG_ORDER`.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Ord, PartialOrd)]
@@ -216,8 +271,27 @@ impl CirclePointIndex {
         Self(1 << (M31_CIRCLE_LOG_ORDER - log_size))
     }
 
+    #[cfg(not(feature = "fast"))]
     pub fn to_point(self) -> CirclePoint<M31> {
         M31_CIRCLE_GEN.mul(self.0 as u128)
+    }
+
+    /// stwo-soroban patch (`fast`): the same point from a table of `GEN * (d << 4w)`, one circle
+    /// addition per non-zero 4-bit digit of the index instead of a double-and-add over 31 bits.
+    #[cfg(feature = "fast")]
+    pub fn to_point(self) -> CirclePoint<M31> {
+        let mut index = self.0 & ((1 << M31_CIRCLE_LOG_ORDER) - 1);
+        let mut res = CirclePoint { x: M31::from_u32_unchecked(1), y: M31::from_u32_unchecked(0) };
+        let mut window = 0;
+        while index != 0 {
+            let digit = index & (TWIDDLE_WINDOW_SIZE - 1);
+            if digit != 0 {
+                res = res + TWIDDLE_TABLE[window][digit];
+            }
+            index >>= TWIDDLE_WINDOW_BITS;
+            window += 1;
+        }
+        res
     }
 
     pub fn half(self) -> Self {

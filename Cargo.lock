@@ -2134,6 +2134,7 @@ dependencies = [
 name = "stwo-soroban-air"
 version = "0.1.0"
 dependencies = [
+ "itertools 0.12.1",
  "num-traits",
  "serde",
  "stwo",

@@ -1,0 +1,100 @@
+{
+ "loop only": {
+  "op": 0,
+  "n": 2000,
+  "fuel_per_op": 19.0,
+  "cpu_per_op": 76.0,
+  "wasm_calls_per_op": 0.0
+ },
+ "M31 add": {
+  "op": 1,
+  "n": 2000,
+  "fuel_per_op": 19.0,
+  "cpu_per_op": 76.0,
+  "wasm_calls_per_op": 0.0
+ },
+ "M31 mul": {
+  "op": 2,
+  "n": 2000,
+  "fuel_per_op": 26.0,
+  "cpu_per_op": 104.0,
+  "wasm_calls_per_op": 0.0
+ },
+ "M31 inverse": {
+  "op": 3,
+  "n": 200,
+  "fuel_per_op": 939.0,
+  "cpu_per_op": 3756.0,
+  "wasm_calls_per_op": 1.0
+ },
+ "CM31 mul": {
+  "op": 4,
+  "n": 2000,
+  "fuel_per_op": 191.0,
+  "cpu_per_op": 764.0,
+  "wasm_calls_per_op": 1.0
+ },
+ "QM31 add": {
+  "op": 5,
+  "n": 2000,
+  "fuel_per_op": 19.0,
+  "cpu_per_op": 76.0,
+  "wasm_calls_per_op": 0.0
+ },
+ "QM31 mul": {
+  "op": 6,
+  "n": 2000,
+  "fuel_per_op": 1106.0,
+  "cpu_per_op": 4424.0,
+  "wasm_calls_per_op": 6.0
+ },
+ "QM31 mul by M31": {
+  "op": 7,
+  "n": 2000,
+  "fuel_per_op": 186.0,
+  "cpu_per_op": 744.0,
+  "wasm_calls_per_op": 1.0
+ },
+ "QM31 inverse": {
+  "op": 8,
+  "n": 200,
+  "fuel_per_op": 2103.0,
+  "cpu_per_op": 8412.0,
+  "wasm_calls_per_op": 7.0
+ },
+ "Blake2s of 64 B (one compression)": {
+  "op": 9,
+  "n": 2000,
+  "fuel_per_op": 5470.0,
+  "cpu_per_op": 21880.0,
+  "wasm_calls_per_op": 7.0
+ },
+ "circle point by scalar (a FRI twiddle)": {
+  "op": 10,
+  "n": 200,
+  "fuel_per_op": 11182.6,
+  "cpu_per_op": 44730.4,
+  "wasm_calls_per_op": 49.3
+ },
+ "bn254_fr_mul through the host": {
+  "op": 11,
+  "n": 200,
+  "fuel_per_op": 526.0,
+  "cpu_per_op": 12842.0,
+  "wasm_calls_per_op": 1.0
+ },
+ "bn254_fr_add through the host": {
+  "op": 12,
+  "n": 200,
+  "fuel_per_op": 526.0,
+  "cpu_per_op": 11347.0,
+  "wasm_calls_per_op": 1.0
+ },
+ "sha256 of 64 B through the host": {
+  "op": 13,
+  "n": 200,
+  "fuel_per_op": 504.0,
+  "cpu_per_op": 17402.0,
+  "wasm_calls_per_op": 0.0
+ }
+}

@@ -11,6 +11,9 @@ path = "src/main.rs"
 
 [features]
 keccak = ["stwo-soroban-air/keccak"]
+# `count-ops`: field operations and Blake2s hashes per verifier phase (profiling, see README).
+op-count = ["stwo/op-count"]
+fast = ["stwo-soroban-air/fast"]
 
 [dependencies]
 stwo = { workspace = true, features = ["prover"] }

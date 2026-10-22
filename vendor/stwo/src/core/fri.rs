@@ -251,16 +251,24 @@ impl<MC: MerkleChannel> FriVerifier<MC> {
     ) -> Result<(), FriVerificationError> {
         let first_layer_sparse_eval =
             self.decommit_first_layer(queries, first_layer_query_evals)?;
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("fri_first_layer");
         let inner_layer_queries = queries.fold(self.config.fold_step);
         let (last_layer_queries, last_layer_query_evals) =
             self.decommit_inner_layers(&inner_layer_queries, first_layer_sparse_eval)?;
-        self.decommit_last_layer(last_layer_queries, last_layer_query_evals)
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("fri_inner_layers");
+        let r = self.decommit_last_layer(last_layer_queries, last_layer_query_evals);
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::checkpoint("fri_last_layer");
+        r
     }
 
     /// Verifies the first layer decommitment.
     ///
     /// Returns the queries and first layer folded column evaluations needed for
     /// verifying the remaining layers.
+    #[cfg_attr(feature = "probe", inline(never))]
     fn decommit_first_layer(
         &self,
         queries: &Queries,
@@ -272,6 +280,7 @@ impl<MC: MerkleChannel> FriVerifier<MC> {
     /// Verifies all inner layer decommitments.
     ///
     /// Returns the queries and query evaluations needed for verifying the last FRI layer.
+    #[cfg_attr(feature = "probe", inline(never))]
     fn decommit_inner_layers(
         &self,
         queries: &Queries,
@@ -297,6 +306,7 @@ impl<MC: MerkleChannel> FriVerifier<MC> {
     }
 
     /// Verifies the last layer.
+    #[cfg_attr(feature = "probe", inline(never))]
     fn decommit_last_layer(
         self,
         queries: Queries,
@@ -316,6 +326,7 @@ impl<MC: MerkleChannel> FriVerifier<MC> {
     }
 
     /// Samples and returns query positions mapped by column log size.
+    #[cfg_attr(feature = "probe", inline(never))]
     pub fn sample_query_positions(&mut self, channel: &mut MC::C) -> Vec<usize> {
         let first_layer_log_size = self.first_layer.column_commitment_domain.log_size();
         let unsorted_query_locations =
@@ -500,12 +511,17 @@ impl<H: MerkleHasherLifted> FriFirstLayerVerifier<H> {
             log_column_size,
         );
 
+        #[cfg(not(feature = "fast"))]
         merkle_verifier
             .verify(
                 &shifted_decommitment_positions,
                 decommitted_values,
                 self.proof.decommitment.clone(),
             )
+            .map_err(|error| FriVerificationError::FirstLayerCommitmentInvalid { error })?;
+        #[cfg(feature = "fast")]
+        merkle_verifier
+            .verify_ref(&shifted_decommitment_positions, &decommitted_values, &self.proof.decommitment)
             .map_err(|error| FriVerificationError::FirstLayerCommitmentInvalid { error })?;
 
         Ok(sparse_evaluation)
@@ -535,6 +551,7 @@ impl<H: MerkleHasherLifted> FriInnerLayerVerifier<H> {
     /// Panics if:
     /// * The number of queries doesn't match the number of evals.
     /// * The queries are sampled on the wrong domain.
+    #[cfg_attr(feature = "probe", inline(never))]
     fn verify_and_fold(
         &self,
         queries: Queries,
@@ -577,12 +594,20 @@ impl<H: MerkleHasherLifted> FriInnerLayerVerifier<H> {
             log_column_size,
         );
 
+        #[cfg(not(feature = "fast"))]
         merkle_verifier
             .verify(
                 &shifted_decommitment_positions,
                 decommitted_values,
                 self.proof.decommitment.clone(),
             )
+            .map_err(|e| FriVerificationError::InnerLayerCommitmentInvalid {
+                inner_layer: self.layer_index,
+                error: e,
+            })?;
+        #[cfg(feature = "fast")]
+        merkle_verifier
+            .verify_ref(&shifted_decommitment_positions, &decommitted_values, &self.proof.decommitment)
             .map_err(|e| FriVerificationError::InnerLayerCommitmentInvalid {
                 inner_layer: self.layer_index,
                 error: e,
@@ -602,6 +627,7 @@ impl<H: MerkleHasherLifted> FriInnerLayerVerifier<H> {
 /// # Panics
 ///
 /// Panics if the number of queries doesn't match the number of query evals.
+#[cfg_attr(feature = "probe", inline(never))]
 fn compute_decommitment_positions_and_rebuild_evals(
     queries: &Queries,
     query_evals: &[QM31],
@@ -644,6 +670,7 @@ fn compute_decommitment_positions_and_rebuild_evals(
 /// passed to the `verify` method of the Merkle verifier. We divide the position indices by
 /// 2^leaf_log_size and deduplicate them, and we reshape the values into rows of length
 /// 2^leaf_log_size.
+#[cfg_attr(feature = "probe", inline(never))]
 fn build_merkle_verification_inputs(
     decommitment_positions: &[usize],
     mut flattened_decommitment_values: impl Iterator<Item = SecureField>,
@@ -693,6 +720,7 @@ impl SparseEvaluation {
         Self { subset_evals, subset_domain_initial_indexes }
     }
 
+    #[cfg_attr(feature = "probe", inline(never))]
     fn fold_line(
         self,
         fold_alpha: SecureField,
@@ -708,6 +736,7 @@ impl SparseEvaluation {
             .collect()
     }
 
+    #[cfg_attr(feature = "probe", inline(never))]
     fn fold_circle(
         self,
         fold_alpha: SecureField,
@@ -767,6 +796,7 @@ pub fn fold_line(
     (domain.double(), folded_values)
 }
 
+#[cfg(not(feature = "fast"))]
 pub fn fold_coset(
     mut eval: Vec<SecureField>,
     domain: LineDomain,
@@ -791,6 +821,7 @@ pub fn fold_coset(
 /// Folds a degree `d` circle polynomial into a degree `d/2` univariate
 /// polynomial.
 /// See [`crate::prover::fri::FriOps::fold_circle_into_line`].
+#[cfg(not(feature = "fast"))]
 pub fn fold_circle_into_line(
     src: &[SecureField],
     src_domain: CircleDomain,
@@ -811,6 +842,91 @@ pub fn fold_circle_into_line(
 
         dst[i] = f_prime;
     });
+    dst
+}
+
+
+/// stwo-soroban patch (`fast`): the same fold as [`fold_coset`] with the twiddles generated by
+/// stepping along the coset (one circle addition each) instead of a scalar multiplication per
+/// butterfly, doubled through the levels with `double_x`, and inverted in one batch.
+#[cfg(feature = "fast")]
+pub fn fold_coset(
+    mut eval: Vec<SecureField>,
+    domain: LineDomain,
+    alpha: SecureField,
+) -> SecureField {
+    use crate::core::fields::FieldExpOps;
+    let n = domain.log_size();
+    let coset = domain.coset();
+    let size = 1usize << n;
+    // x-coordinates of the coset points, in coset order.
+    let mut xs: Vec<BaseField> = Vec::with_capacity(size);
+    let mut p = coset.initial;
+    for _ in 0..size {
+        xs.push(p.x);
+        p = p + coset.step;
+    }
+    // Twiddles of every level, in the order the butterflies use them: level i works on the
+    // i-times-doubled coset, whose point m is the double of point m of the previous level.
+    let mut twiddles: Vec<BaseField> = Vec::with_capacity(size);
+    for i in 0..n {
+        let level_log_size = n - i;
+        for j in (0..1usize << level_log_size).step_by(2) {
+            twiddles.push(xs[bit_reverse_index(j, level_log_size)]);
+        }
+        for x in xs.iter_mut() {
+            *x = crate::core::circle::CirclePoint::<BaseField>::double_x(*x);
+        }
+    }
+    let mut itwiddles = twiddles.clone();
+    BaseField::batch_inverse(&twiddles, &mut itwiddles);
+    let mut itwiddles = itwiddles.into_iter();
+    let mut folding_alpha = alpha;
+    for i in 0..n {
+        for j in (0..1usize << (n - i)).step_by(2) {
+            let (mut f0, mut f1) = (eval[j], eval[j + 1]);
+            ibutterfly(&mut f0, &mut f1, itwiddles.next().unwrap());
+            eval[j >> 1] = f0 + folding_alpha * f1;
+        }
+        folding_alpha = folding_alpha * folding_alpha;
+    }
+    eval[0]
+}
+
+/// stwo-soroban patch (`fast`): the same fold as [`fold_circle_into_line`] with the y twiddles taken
+/// from the half coset by stepping (the second half of a circle domain is the conjugate of the
+/// first) and inverted in one batch.
+#[cfg(feature = "fast")]
+pub fn fold_circle_into_line(
+    src: &[SecureField],
+    src_domain: CircleDomain,
+    alpha: SecureField,
+) -> Vec<SecureField> {
+    use crate::core::fields::FieldExpOps;
+    let log_size = src_domain.log_size();
+    let half = src_domain.half_coset;
+    let half_size = half.size();
+    let mut ys: Vec<BaseField> = Vec::with_capacity(2 * half_size);
+    let mut p = half.initial;
+    for _ in 0..half_size {
+        ys.push(p.y);
+        p = p + half.step;
+    }
+    for k in 0..half_size {
+        let y = ys[k];
+        ys.push(-y);
+    }
+    let n_pairs = src.len() >> 1;
+    let twiddles: Vec<BaseField> =
+        (0..n_pairs).map(|i| ys[bit_reverse_index(i << 1, log_size)]).collect();
+    let mut itwiddles = twiddles.clone();
+    BaseField::batch_inverse(&twiddles, &mut itwiddles);
+    let mut dst = vec![SecureField::zero(); n_pairs];
+    for (i, (pair, itwid)) in src.chunks_exact(2).zip(itwiddles).enumerate() {
+        let (mut f0_px, mut f1_px) = (pair[0], pair[1]);
+        ibutterfly(&mut f0_px, &mut f1_px, itwid);
+        dst[i] = alpha * f1_px + f0_px;
+    }
     dst
 }
 

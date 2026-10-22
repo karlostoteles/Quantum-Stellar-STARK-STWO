@@ -1,0 +1,20 @@
+{
+  "fri": {
+    "fold_step": 1,
+    "log_blowup_factor": 1,
+    "log_last_layer_degree_bound": 0,
+    "n_queries": 70,
+    "pow_bits": 26,
+    "security_bits": 96
+  },
+  "native_verify": "Ok(96)",
+  "native_verify_us_median": 766,
+  "proof_bytes": 71701,
+  "statement": {
+    "a0": 1,
+    "a1": 3141592,
+    "last": 1476137047,
+    "log_n_rows": 10,
+    "terms": 100
+  }
+}

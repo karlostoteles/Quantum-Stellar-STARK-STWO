@@ -13,8 +13,10 @@ doctest = false
 [features]
 # Hash with the host's keccak256 instead of Blake2s compiled into the contract.
 keccak = ["stwo-soroban-air/keccak", "stwo/host-keccak"]
-# Profiling entry points, not for deployment.
-probe = []
+# Profiling entry points (decode only, verifier by phases, micro-benchmarks), not for deployment.
+probe = ["stwo-soroban-air/probe"]
+# Cheaper verifier, same results: FAST=1 ./scripts/build-contract.sh (see PATCHES.md, change 6).
+fast = ["stwo-soroban-air/fast", "stwo/fast"]
 
 [dependencies]
 soroban-sdk = { version = "29.0.1", features = ["alloc"] }

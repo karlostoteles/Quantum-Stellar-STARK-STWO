@@ -104,6 +104,76 @@ impl FrameworkEval for FibSqEval {
 
 pub type FibSqComponent = FrameworkComponent<FibSqEval>;
 
+#[cfg(feature = "probe")]
+pub mod probe;
+
+/// The same component as [`FibSqComponent`], written out by hand for the verifier (feature `fast`):
+/// no constraint-framework "info" pass at run time, mask points without a point addition per
+/// column, and the constraints evaluated directly. Same trace layout, same constraint order, same
+/// values, so it accepts exactly the proofs the framework component accepts. The prover keeps using
+/// [`FibSqComponent`].
+#[cfg(feature = "fast")]
+pub struct FibSqFastComponent(pub FibSqEval);
+
+#[cfg(feature = "fast")]
+impl Component for FibSqFastComponent {
+    fn n_constraints(&self) -> usize {
+        SEQ_LEN + 1
+    }
+
+    fn max_constraint_log_degree_bound(&self) -> u32 {
+        self.0.log_n_rows + 1
+    }
+
+    fn trace_log_degree_bounds(&self) -> stwo::core::pcs::TreeVec<stwo::core::ColumnVec<u32>> {
+        stwo::core::pcs::TreeVec::new(alloc::vec![alloc::vec![], alloc::vec![self.0.log_n_rows; SEQ_LEN]])
+    }
+
+    fn mask_points(
+        &self,
+        point: stwo::core::circle::CirclePoint<SecureField>,
+        _max_log_degree_bound: u32,
+    ) -> stwo::core::pcs::TreeVec<stwo::core::ColumnVec<alloc::vec::Vec<stwo::core::circle::CirclePoint<SecureField>>>> {
+        // Every column is read at offset 0: the framework adds the zero point to `point` here.
+        stwo::core::pcs::TreeVec::new(alloc::vec![alloc::vec![], alloc::vec![alloc::vec![point]; SEQ_LEN]])
+    }
+
+    fn preprocessed_column_indices(&self) -> stwo::core::ColumnVec<usize> {
+        alloc::vec![]
+    }
+
+    fn evaluate_constraint_quotients_at_point(
+        &self,
+        point: stwo::core::circle::CirclePoint<SecureField>,
+        mask: &stwo::core::pcs::TreeVec<stwo::core::ColumnVec<alloc::vec::Vec<SecureField>>>,
+        evaluation_accumulator: &mut stwo::core::air::accumulation::PointEvaluationAccumulator,
+        max_log_degree_bound: u32,
+    ) {
+        use stwo::core::constraints::coset_vanishing;
+        use stwo::core::poly::circle::CanonicCoset;
+        let denom_inverse = coset_vanishing(CanonicCoset::new(max_log_degree_bound).coset, point).inverse();
+        let m = &mask[1];
+        // Same order as FibSqEval::evaluate: a - a0, b - a1, the transitions, then last.
+        let mut acc = |c: SecureField| evaluation_accumulator.accumulate(denom_inverse * c);
+        acc(m[0][0] - SecureField::from(self.0.a0));
+        acc(m[1][0] - SecureField::from(self.0.a1));
+        for i in 2..SEQ_LEN {
+            acc(m[i][0] - (m[i - 2][0].square() + m[i - 1][0].square()));
+        }
+        acc(m[SEQ_LEN - 1][0] - SecureField::from(self.0.last));
+    }
+}
+
+#[cfg(feature = "fast")]
+pub fn fast_component(s: &Statement) -> FibSqFastComponent {
+    FibSqFastComponent(FibSqEval {
+        log_n_rows: s.log_n_rows,
+        a0: BaseField::from(s.a0),
+        a1: BaseField::from(s.a1),
+        last: BaseField::from(s.last),
+    })
+}
+
 /// Computes term `SEQ_LEN - 1` of the sequence starting at (a0, a1).
 pub fn fibsq_last(a0: u32, a1: u32) -> u32 {
     let (mut a, mut b) = (BaseField::from(a0), BaseField::from(a1));
@@ -183,7 +253,10 @@ pub fn verify_envelope(envelope: Envelope) -> Result<u32, VerifyError> {
         return Err(VerifyError::InvalidProof);
     }
 
+    #[cfg(not(feature = "fast"))]
     let component = component(&s);
+    #[cfg(feature = "fast")]
+    let component = fast_component(&s);
     let channel = &mut ProofChannel::default();
     mix_statement(channel, &s);
     let commitment_scheme = &mut CommitmentSchemeVerifier::<MerkleChannel>::new(config);

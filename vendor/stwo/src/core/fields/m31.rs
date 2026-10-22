@@ -43,6 +43,7 @@ impl M31 {
     /// let val = 2 * P - 19;
     /// assert_eq!(M31::partial_reduce(val), M31::from(P - 19));
     /// ```
+    #[cfg_attr(feature = "fast", inline(always))]
     pub fn partial_reduce(val: u32) -> Self {
         Self(val.checked_sub(P).unwrap_or(val))
     }
@@ -65,6 +66,7 @@ impl M31 {
 
     pub fn inverse(&self) -> Self {
         assert!(!self.is_zero(), "0 has no inverse");
+        crate::op_count!(M31_INV);
         pow2147483645(*self)
     }
 }
@@ -78,7 +80,9 @@ impl Display for M31 {
 impl Add for M31 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn add(self, rhs: Self) -> Self::Output {
+        crate::op_count!(M31_ADD);
         Self::partial_reduce(self.0 + rhs.0)
     }
 }
@@ -86,7 +90,9 @@ impl Add for M31 {
 impl Neg for M31 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn neg(self) -> Self::Output {
+        crate::op_count!(M31_NEG);
         Self::partial_reduce(P - self.0)
     }
 }
@@ -94,7 +100,9 @@ impl Neg for M31 {
 impl Sub for M31 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn sub(self, rhs: Self) -> Self::Output {
+        crate::op_count!(M31_SUB);
         Self::partial_reduce(self.0 + P - rhs.0)
     }
 }
@@ -102,7 +110,9 @@ impl Sub for M31 {
 impl Mul for M31 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn mul(self, rhs: Self) -> Self::Output {
+        crate::op_count!(M31_MUL);
         Self::reduce((self.0 as u64) * (rhs.0 as u64))
     }
 }

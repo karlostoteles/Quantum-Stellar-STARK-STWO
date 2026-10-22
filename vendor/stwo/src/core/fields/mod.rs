@@ -304,6 +304,7 @@ macro_rules! impl_extension_field {
         impl Add for $field_name {
             type Output = Self;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn add(self, rhs: Self) -> Self::Output {
                 Self(self.0 + rhs.0, self.1 + rhs.1)
             }
@@ -312,6 +313,7 @@ macro_rules! impl_extension_field {
         impl Neg for $field_name {
             type Output = Self;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn neg(self) -> Self::Output {
                 Self(-self.0, -self.1)
             }
@@ -320,6 +322,7 @@ macro_rules! impl_extension_field {
         impl Sub for $field_name {
             type Output = Self;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn sub(self, rhs: Self) -> Self::Output {
                 Self(self.0 - rhs.0, self.1 - rhs.1)
             }
@@ -344,6 +347,7 @@ macro_rules! impl_extension_field {
         impl Add<M31> for $field_name {
             type Output = Self;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn add(self, rhs: M31) -> Self::Output {
                 Self(self.0 + rhs, self.1)
             }
@@ -360,6 +364,7 @@ macro_rules! impl_extension_field {
         impl Sub<M31> for $field_name {
             type Output = Self;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn sub(self, rhs: M31) -> Self::Output {
                 Self(self.0 - rhs, self.1)
             }
@@ -376,6 +381,7 @@ macro_rules! impl_extension_field {
         impl Mul<M31> for $field_name {
             type Output = Self;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn mul(self, rhs: M31) -> Self::Output {
                 Self(self.0 * rhs, self.1 * rhs)
             }
@@ -384,6 +390,7 @@ macro_rules! impl_extension_field {
         impl Mul<$field_name> for M31 {
             type Output = $field_name;
 
+            #[cfg_attr(feature = "fast", inline(always))]
             fn mul(self, rhs: $field_name) -> Self::Output {
                 rhs * self
             }

@@ -106,6 +106,134 @@ impl StwoVerifier {
         envelope.proof.commitments.len() as u32
     }
 
+    /// Profiling only: decodes the envelope and runs the verifier up to phase `until`
+    /// (see `stwo_soroban_air::probe::PHASES`; 0 = decode only). Returns the security bits.
+    #[cfg(feature = "probe")]
+    pub fn verify_phase(_env: Env, proof: Bytes, until: u32) -> u32 {
+        let raw = proof.to_alloc_vec();
+        let envelope: Envelope = postcard::from_bytes(&raw).unwrap();
+        drop(raw);
+        stwo_soroban_air::probe::verify_until(envelope, until as usize).unwrap()
+    }
+
+    /// Profiling only: `n` iterations of one operation on values the compiler cannot fold, so the
+    /// cost per operation is (cost(2n) - cost(n)) / n. `op` selects the operation:
+    /// 0 loop only · 1 M31 add · 2 M31 mul · 3 M31 inverse · 4 CM31 mul · 5 QM31 add · 6 QM31 mul ·
+    /// 7 QM31 mul by M31 · 8 QM31 inverse · 9 Blake2s of 64 bytes (one compression) ·
+    /// 10 circle point by scalar (a FRI twiddle) · 11 bn254_fr_mul through the host (precedent) ·
+    /// 12 bn254_fr_add through the host · 13 sha256 of 64 bytes through the host.
+    #[cfg(feature = "probe")]
+    pub fn bench(env: Env, op: u32, n: u32) -> u32 {
+        use stwo::core::circle::{CirclePoint, CirclePointIndex};
+        use stwo::core::fields::cm31::CM31;
+        use stwo::core::fields::m31::M31;
+        use stwo::core::fields::qm31::QM31;
+        use stwo::core::fields::FieldExpOps;
+        use stwo::core::vcs_lifted::merkle_hasher::MerkleHasherLifted;
+        use stwo_soroban_air::Hasher;
+        let seed = M31::from(n.wrapping_mul(2654435761) % 2147483647);
+        let mut acc = 0u32;
+        match op {
+            0 => {
+                let mut x = n;
+                for i in 0..n {
+                    x = x.wrapping_mul(3).wrapping_add(i);
+                }
+                acc = x;
+            }
+            1 => {
+                let (mut x, y) = (seed, M31::from(7u32));
+                for _ in 0..n {
+                    x = x + y;
+                }
+                acc = x.0;
+            }
+            2 => {
+                let (mut x, y) = (seed, M31::from(7u32));
+                for _ in 0..n {
+                    x = x * y;
+                }
+                acc = x.0;
+            }
+            3 => {
+                let mut x = seed + M31::from(1u32);
+                for _ in 0..n {
+                    x = x.inverse() + M31::from(1u32);
+                }
+                acc = x.0;
+            }
+            4 => {
+                let (mut x, y) = (CM31::from_m31(seed, M31::from(3u32)), CM31::from_m31(M31::from(5u32), M31::from(7u32)));
+                for _ in 0..n {
+                    x = x * y;
+                }
+                acc = x.0 .0;
+            }
+            5 => {
+                let (mut x, y) = (QM31::from_m31(seed, seed, seed, seed), QM31::from_u32_unchecked(1, 2, 3, 4));
+                for _ in 0..n {
+                    x = x + y;
+                }
+                acc = x.0 .0 .0;
+            }
+            6 => {
+                let (mut x, y) = (QM31::from_m31(seed, seed, seed, seed), QM31::from_u32_unchecked(1, 2, 3, 4));
+                for _ in 0..n {
+                    x = x * y;
+                }
+                acc = x.0 .0 .0;
+            }
+            7 => {
+                let (mut x, y) = (QM31::from_m31(seed, seed, seed, seed), M31::from(7u32));
+                for _ in 0..n {
+                    x = x * y;
+                }
+                acc = x.0 .0 .0;
+            }
+            8 => {
+                let mut x = QM31::from_m31(seed, seed, seed, seed) + QM31::from_u32_unchecked(1, 0, 0, 0);
+                for _ in 0..n {
+                    x = x.inverse() + QM31::from_u32_unchecked(1, 0, 0, 0);
+                }
+                acc = x.0 .0 .0;
+            }
+            9 => {
+                let mut h = stwo::core::vcs::blake2_hash::Blake2sHash([n as u8; 32]);
+                for _ in 0..n {
+                    h = Hasher::hash_children((h, h));
+                }
+                acc = h.0[0] as u32;
+            }
+            10 => {
+                let mut p = CirclePoint::<M31>::zero();
+                for i in 0..n {
+                    p = p + CirclePointIndex(seed.0.wrapping_add(i) as usize).to_point();
+                }
+                acc = p.x.0;
+            }
+            11 | 12 => {
+                let bn = env.crypto().bn254();
+                let mut x = soroban_sdk::crypto::bn254::Bn254Fr::from_u256(soroban_sdk::U256::from_u32(&env, seed.0));
+                let y = soroban_sdk::crypto::bn254::Bn254Fr::from_u256(soroban_sdk::U256::from_u32(&env, 7));
+                for _ in 0..n {
+                    x = if op == 11 { bn.fr_mul(&x, &y) } else { bn.fr_add(&x, &y) };
+                }
+                acc = x.to_u256().to_be_bytes().get(31).unwrap() as u32;
+            }
+            13 => {
+                let mut b = soroban_sdk::BytesN::<32>::from_array(&env, &[n as u8; 32]);
+                for _ in 0..n {
+                    let mut input = Bytes::from_array(&env, &b.to_array());
+                    input.append(&Bytes::from_array(&env, &b.to_array()));
+                    b = env.crypto().sha256(&input).into();
+                }
+                acc = b.get(0).unwrap() as u32;
+            }
+            _ => panic!(),
+        }
+        acc
+    }
+
     /// Sequence length of the statement this contract checks (a_0 .. a_{terms-1}).
     pub fn terms(_env: Env) -> u32 {
         stwo_soroban_air::SEQ_LEN as u32

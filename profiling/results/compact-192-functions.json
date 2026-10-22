@@ -1,0 +1,1084 @@
+{
+  "wasm": "/home/claude/work/stwo-soroban/profiling/results/verifier-named.wasm",
+  "entry": "verify",
+  "argument": "/home/claude/work/stwo-soroban/proofs/compact-192.bin",
+  "ok": true,
+  "cpu_instructions": 73715193,
+  "mem_bytes": 1653441,
+  "wasm_fuel_total": 17980424,
+  "wasm_calls_total": 48641,
+  "budget": "=================================================================\nCpu limit: 18446744073709551615; used: 73715253\nMem limit: 18446744073709551615; used: 1260129\n=================================================================\nCostType                           cpu_insns      mem_bytes      \nWasmInsnExec                       71921696       0              \nMemAlloc                           212226         1511214        \nMemCpy                             7898           0              \nMemCmp                             1105           0              \nDispatchHostFunction               2655           0              \nVisitObject                        2580           0              \nValSer                             0              0              \nValDeser                           0              0              \nComputeSha256Hash                  1437137        0              \nComputeEd25519PubKey               0              0              \nVerifyEd25519Sig                   0              0              \nVmInstantiation                    0              0              \nVmCachedInstantiation              0              0              \nInvokeVmFunction                   1945           14             \nComputeKeccak256Hash               0              0              \nDecodeEcdsaCurve256Sig             0              0              \nRecoverEcdsaSecp256k1Key           0              0              \nInt256AddSub                       0              0              \nInt256Mul                          0              0              \nInt256Div                          0              0              \nInt256Pow                          0              0              \nInt256Shift                        0              0              \nChaCha20DrawBytes                  0              0              \nParseWasmInstructions              0              0              \nParseWasmFunctions                 0              0              \nParseWasmGlobals                   0              0              \nParseWasmTableEntries              0              0              \nParseWasmTypes                     0              0              \nParseWasmDataSegments              0              0              \nParseWasmElemSegments              0              0              \nParseWasmImports                   0              0              \nParseWasmExports                   0              0              \nParseWasmDataSegmentBytes          0              0              \nInstantiateWasmInstructions        43030          70704          \nInstantiateWasmFunctions           10684          20663          \nInstantiateWasmGlobals             334            213            \nInstantiateWasmTableEntries        232            72             \nInstantiateWasmTypes               0              0              \nInstantiateWasmDataSegments        1259           7089           \nInstantiateWasmElemSegments        331            106            \nInstantiateWasmImports             51810          6102           \nInstantiateWasmExports             16247          501            \nInstantiateWasmDataSegmentBytes    4084           36763          \nSec1DecodePointUncompressed        0              0              \nVerifyEcdsaSecp256r1Sig            0              0              \nBls12381EncodeFp                   0              0              \nBls12381DecodeFp                   0              0              \nBls12381G1CheckPointOnCurve        0              0              \nBls12381G1CheckPointInSubgroup     0              0              \nBls12381G2CheckPointOnCurve        0              0              \nBls12381G2CheckPointInSubgroup     0              0              \nBls12381G1ProjectiveToAffine       0              0              \nBls12381G2ProjectiveToAffine       0              0              \nBls12381G1Add                      0              0              \nBls12381G1Mul                      0              0              \nBls12381G1Msm                      0              0              \nBls12381MapFpToG1                  0              0              \nBls12381HashToG1                   0              0              \nBls12381G2Add                      0              0              \nBls12381G2Mul                      0              0              \nBls12381G2Msm                      0              0              \nBls12381MapFp2ToG2                 0              0              \nBls12381HashToG2                   0              0              \nBls12381Pairing                    0              0              \nBls12381FrFromU256                 0              0              \nBls12381FrToU256                   0              0              \nBls12381FrAddSub                   0              0              \nBls12381FrMul                      0              0              \nBls12381FrPow                      0              0              \nBls12381FrInv                      0              0              \nBn254EncodeFp                      0              0              \nBn254DecodeFp                      0              0              \nBn254G1CheckPointOnCurve           0              0              \nBn254G2CheckPointOnCurve           0              0              \nBn254G2CheckPointInSubgroup        0              0              \nBn254G1ProjectiveToAffine          0              0              \nBn254G1Add                         0              0              \nBn254G1Mul                         0              0              \nBn254Pairing                       0              0              \nBn254FrFromU256                    0              0              \nBn254FrToU256                      0              0              \nBn254FrAddSub                      0              0              \nBn254FrMul                         0              0              \nBn254FrPow                         0              0              \nBn254FrInv                         0              0              \nBn254G1Msm                         0              0              \n=================================================================\n\n\n",
+  "functions": [
+    {
+      "index": 33,
+      "name": "<blake2::Blake2sVarCore>::compress",
+      "self_fuel": 2591568,
+      "inclusive_fuel": 2591568,
+      "calls": 857
+    },
+    {
+      "index": 49,
+      "name": "<stwo::core::fields::cm31::CM31 as core::ops::arith::Mul>::mul",
+      "self_fuel": 2046834,
+      "inclusive_fuel": 2046834,
+      "calls": 20067
+    },
+    {
+      "index": 104,
+      "name": "<stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify",
+      "self_fuel": 2029028,
+      "inclusive_fuel": 6435115,
+      "calls": 5
+    },
+    {
+      "index": 53,
+      "name": "<stwo::core::circle::CirclePoint<stwo::core::fields::m31::M31>>::mul",
+      "self_fuel": 1919112,
+      "inclusive_fuel": 3067428,
+      "calls": 438
+    },
+    {
+      "index": 174,
+      "name": "compiler_builtins::mem::memcpy",
+      "self_fuel": 1867346,
+      "inclusive_fuel": 1867346,
+      "calls": 3213
+    },
+    {
+      "index": 147,
+      "name": "<stwo::core::pcs::verifier::CommitmentSchemeVerifier<stwo::core::vcs_lifted::blake2_merkle::Blake2sM31MerkleChannel>>::verify_values",
+      "self_fuel": 1553596,
+      "inclusive_fuel": 14169783,
+      "calls": 1
+    },
+    {
+      "index": 48,
+      "name": "<stwo::core::fields::qm31::QM31 as core::ops::arith::Mul>::mul",
+      "self_fuel": 852624,
+      "inclusive_fuel": 1729314,
+      "calls": 1719
+    },
+    {
+      "index": 15,
+      "name": "verify",
+      "self_fuel": 820932,
+      "inclusive_fuel": 17980424,
+      "calls": 0
+    },
+    {
+      "index": 175,
+      "name": "compiler_builtins::mem::memset",
+      "self_fuel": 456084,
+      "inclusive_fuel": 456084,
+      "calls": 1633
+    },
+    {
+      "index": 61,
+      "name": "<stwo::core::fields::qm31::QM31 as core::ops::arith::Mul<stwo::core::fields::m31::M31>>::mul",
+      "self_fuel": 413248,
+      "inclusive_fuel": 413248,
+      "calls": 4696
+    },
+    {
+      "index": 1,
+      "name": "__rustc::__rust_alloc",
+      "self_fuel": 307296,
+      "inclusive_fuel": 349842,
+      "calls": 1746
+    },
+    {
+      "index": 2,
+      "name": "<postcard::de::deserializer::SeqAccess<postcard::de::flavors::Slice> as serde_core::de::SeqAccess>::next_element::<stwo::core::vcs::blake2_hash::Blake2sHash>",
+      "self_fuel": 260475,
+      "inclusive_fuel": 260475,
+      "calls": 453
+    },
+    {
+      "index": 178,
+      "name": "memcpy",
+      "self_fuel": 231336,
+      "inclusive_fuel": 2098682,
+      "calls": 3213
+    },
+    {
+      "index": 82,
+      "name": "<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>::finalize",
+      "self_fuel": 220286,
+      "inclusive_fuel": 2856130,
+      "calls": 682
+    },
+    {
+      "index": 139,
+      "name": "stwo::core::fri::build_merkle_verification_inputs::<core::iter::adapters::copied::Copied<core::iter::adapters::flatten::Flatten<core::slice::iter::Iter<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>>>>",
+      "self_fuel": 171464,
+      "inclusive_fuel": 307972,
+      "calls": 2
+    },
+    {
+      "index": 57,
+      "name": "stwo::core::fields::m31::pow2147483645::<stwo::core::fields::m31::M31>",
+      "self_fuel": 157620,
+      "inclusive_fuel": 157620,
+      "calls": 185
+    },
+    {
+      "index": 4,
+      "name": "<postcard::de::deserializer::SeqAccess<postcard::de::flavors::Slice> as serde_core::de::SeqAccess>::next_element::<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>",
+      "self_fuel": 142379,
+      "inclusive_fuel": 164468,
+      "calls": 114
+    },
+    {
+      "index": 180,
+      "name": "memset",
+      "self_fuel": 117576,
+      "inclusive_fuel": 573660,
+      "calls": 1633
+    },
+    {
+      "index": 93,
+      "name": "<stwo_constraint_framework::info::ArithmeticCounter<false>>::drain",
+      "self_fuel": 115460,
+      "inclusive_fuel": 496646,
+      "calls": 502
+    },
+    {
+      "index": 27,
+      "name": "<alloc::raw_vec::RawVecInner>::finish_grow",
+      "self_fuel": 113778,
+      "inclusive_fuel": 564813,
+      "calls": 441
+    },
+    {
+      "index": 0,
+      "name": "<alloc::vec::Vec<stwo::core::vcs::blake2_hash::Blake2sHash> as serde_core::de::Deserialize>::deserialize::<&mut postcard::de::deserializer::Deserializer<postcard::de::flavors::Slice>>",
+      "self_fuel": 112905,
+      "inclusive_fuel": 373225,
+      "calls": 6
+    },
+    {
+      "index": 24,
+      "name": "stwo_soroban_air::verify_envelope",
+      "self_fuel": 101087,
+      "inclusive_fuel": 16517959,
+      "calls": 1
+    },
+    {
+      "index": 163,
+      "name": "<stwo_constraint_framework::info::InfoEvaluator as stwo_constraint_framework::EvalAtRow>::add_constraint::<stwo_constraint_framework::info::ArithmeticCounter<false>>",
+      "self_fuel": 96960,
+      "inclusive_fuel": 523983,
+      "calls": 101
+    },
+    {
+      "index": 134,
+      "name": "<core::iter::adapters::flatten::Flatten<core::iter::adapters::flatten::Flatten<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>>>> as core::iter::traits::iterator::Iterator>::next",
+      "self_fuel": 85035,
+      "inclusive_fuel": 85185,
+      "calls": 109
+    },
+    {
+      "index": 140,
+      "name": "stwo::core::fri::compute_decommitment_positions_and_rebuild_evals::<&mut core::iter::adapters::copied::Copied<core::slice::iter::Iter<stwo::core::fields::qm31::QM31>>>",
+      "self_fuel": 81637,
+      "inclusive_fuel": 188383,
+      "calls": 2
+    },
+    {
+      "index": 12,
+      "name": "<alloc::raw_vec::RawVecInner>::grow_amortized",
+      "self_fuel": 63360,
+      "inclusive_fuel": 627716,
+      "calls": 440
+    },
+    {
+      "index": 28,
+      "name": "__rustc::__rust_realloc",
+      "self_fuel": 60928,
+      "inclusive_fuel": 421296,
+      "calls": 238
+    },
+    {
+      "index": 56,
+      "name": "stwo::core::fri::fold_coset",
+      "self_fuel": 60340,
+      "inclusive_fuel": 1044611,
+      "calls": 40
+    },
+    {
+      "index": 173,
+      "name": "<stwo_constraint_framework::component::FrameworkComponent<stwo_soroban_air::FibSqEval> as stwo::core::air::Component>::evaluate_constraint_quotients_at_point",
+      "self_fuel": 54282,
+      "inclusive_fuel": 618111,
+      "calls": 1
+    },
+    {
+      "index": 123,
+      "name": "<stwo_constraint_framework::info::ArithmeticCounter<false>>::merge::<false>",
+      "self_fuel": 51541,
+      "inclusive_fuel": 265704,
+      "calls": 199
+    },
+    {
+      "index": 95,
+      "name": "<stwo_constraint_framework::info::InfoEvaluator as stwo_constraint_framework::EvalAtRow>::next_interaction_mask::<1>",
+      "self_fuel": 50900,
+      "inclusive_fuel": 132198,
+      "calls": 100
+    },
+    {
+      "index": 47,
+      "name": "<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31> as core::ops::arith::Add>::add",
+      "self_fuel": 50505,
+      "inclusive_fuel": 473025,
+      "calls": 105
+    },
+    {
+      "index": 171,
+      "name": "<stwo_constraint_framework::component::FrameworkComponent<stwo_soroban_air::FibSqEval> as stwo::core::air::Component>::mask_points",
+      "self_fuel": 48272,
+      "inclusive_fuel": 540152,
+      "calls": 1
+    },
+    {
+      "index": 91,
+      "name": "<stwo_constraint_framework::info::ArithmeticCounts>::merge",
+      "self_fuel": 46184,
+      "inclusive_fuel": 46184,
+      "calls": 502
+    },
+    {
+      "index": 29,
+      "name": "<soroban_sdk::alloc::bump_pointer::BumpPointerLocal>::maybe_init",
+      "self_fuel": 45816,
+      "inclusive_fuel": 45816,
+      "calls": 1992
+    },
+    {
+      "index": 58,
+      "name": "stwo::core::fft::ibutterfly::<stwo::core::fields::qm31::QM31>",
+      "self_fuel": 37920,
+      "inclusive_fuel": 52000,
+      "calls": 160
+    },
+    {
+      "index": 98,
+      "name": "<alloc::vec::Vec<stwo::core::fields::qm31::QM31> as core::clone::Clone>::clone",
+      "self_fuel": 37024,
+      "inclusive_fuel": 156416,
+      "calls": 208
+    },
+    {
+      "index": 133,
+      "name": "<core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::ops::range::Range<usize>, stwo::core::fri::compute_decommitment_positions_and_rebuild_evals<&mut core::iter::adapters::copied::Copied<core::slice::iter::Iter<stwo::core::fields::qm31::QM31>>>::{closure#1}>, core::result::Result<core::convert::Infallible, stwo::core::fri::InsufficientWitnessError>> as core::iter::traits::iterator::Iterator>::next",
+      "self_fuel": 32880,
+      "inclusive_fuel": 32880,
+      "calls": 240
+    },
+    {
+      "index": 107,
+      "name": "<hashbrown::raw::RawTable<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)>>::reserve_rehash::<hashbrown::map::make_hasher<usize, alloc::vec::Vec<stwo::core::fields::m31::M31>, hashbrown::hasher::DefaultHashBuilder>::{closure#0}>",
+      "self_fuel": 32350,
+      "inclusive_fuel": 40594,
+      "calls": 18
+    },
+    {
+      "index": 127,
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>, alloc::vec::Vec<stwo::core::fields::qm31::QM31>)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>, alloc::vec::Vec<stwo::core::fields::qm31::QM31>), itertools::zip_eq_impl::ZipEq<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>>, alloc::vec::into_iter::IntoIter<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>>>>::from_iter",
+      "self_fuel": 26940,
+      "inclusive_fuel": 38294,
+      "calls": 3
+    },
+    {
+      "index": 96,
+      "name": "<stwo_constraint_framework::point::PointEvaluator as stwo_constraint_framework::EvalAtRow>::add_constraint::<stwo::core::fields::qm31::QM31>",
+      "self_fuel": 25048,
+      "inclusive_fuel": 228260,
+      "calls": 101
+    },
+    {
+      "index": 138,
+      "name": "<alloc::vec::Vec<stwo::core::fields::m31::M31> as core::clone::Clone>::clone",
+      "self_fuel": 22962,
+      "inclusive_fuel": 119744,
+      "calls": 129
+    },
+    {
+      "index": 97,
+      "name": "<stwo_constraint_framework::point::PointEvaluator as stwo_constraint_framework::EvalAtRow>::next_interaction_mask::<1>",
+      "self_fuel": 20300,
+      "inclusive_fuel": 95500,
+      "calls": 100
+    },
+    {
+      "index": 162,
+      "name": "<stwo_constraint_framework::info::ArithmeticCounter<false> as core::ops::arith::Add>::add",
+      "self_fuel": 16915,
+      "inclusive_fuel": 282619,
+      "calls": 199
+    },
+    {
+      "index": 86,
+      "name": "<alloc::vec::Vec<stwo::core::fields::m31::M31>>::reserve",
+      "self_fuel": 16910,
+      "inclusive_fuel": 43145,
+      "calls": 190
+    },
+    {
+      "index": 83,
+      "name": "<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<true>>::finalize",
+      "self_fuel": 16456,
+      "inclusive_fuel": 105025,
+      "calls": 22
+    },
+    {
+      "index": 112,
+      "name": "core::slice::sort::stable::quicksort::quicksort::<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>), <[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>::sort_by_key<usize, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#3}>::{closure#0}>",
+      "self_fuel": 15624,
+      "inclusive_fuel": 30602,
+      "calls": 6
+    },
+    {
+      "index": 84,
+      "name": "<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<true>>::update",
+      "self_fuel": 15323,
+      "inclusive_fuel": 113413,
+      "calls": 37
+    },
+    {
+      "index": 55,
+      "name": "<stwo::core::circle::CirclePoint<stwo::core::fields::m31::M31>>::log_order",
+      "self_fuel": 15182,
+      "inclusive_fuel": 15182,
+      "calls": 42
+    },
+    {
+      "index": 62,
+      "name": "<stwo::core::poly::circle::domain::CircleDomain>::at",
+      "self_fuel": 13938,
+      "inclusive_fuel": 978576,
+      "calls": 101
+    },
+    {
+      "index": 59,
+      "name": "<stwo::core::circle::Coset>::double",
+      "self_fuel": 13359,
+      "inclusive_fuel": 25803,
+      "calls": 61
+    },
+    {
+      "index": 52,
+      "name": "<stwo::core::circle::Coset>::new",
+      "self_fuel": 13328,
+      "inclusive_fuel": 1195562,
+      "calls": 68
+    },
+    {
+      "index": 137,
+      "name": "<itertools::adaptors::coalesce::CoalesceBy<core::iter::adapters::map::Map<core::slice::iter::Iter<usize>, stwo::core::fri::build_merkle_verification_inputs<core::iter::adapters::copied::Copied<core::iter::adapters::flatten::Flatten<core::slice::iter::Iter<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>>>>::{closure#0}>, itertools::adaptors::coalesce::DedupPred2CoalescePred<itertools::adaptors::coalesce::DedupEq>, itertools::adaptors::coalesce::NoCount> as core::iter::traits::iterator::Iterator>::next",
+      "self_fuel": 11866,
+      "inclusive_fuel": 11866,
+      "calls": 82
+    },
+    {
+      "index": 126,
+      "name": "<itertools::zip_eq_impl::ZipEq<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>>>, alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>>> as core::iter::traits::iterator::Iterator>::next",
+      "self_fuel": 11040,
+      "inclusive_fuel": 11040,
+      "calls": 115
+    },
+    {
+      "index": 116,
+      "name": "core::slice::sort::shared::smallsort::bidirectional_merge::<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>), <[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>::sort_by_key<usize, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#3}>::{closure#0}>",
+      "self_fuel": 10206,
+      "inclusive_fuel": 10206,
+      "calls": 14
+    },
+    {
+      "index": 9,
+      "name": "<alloc::raw_vec::RawVec<stwo::core::fri::FriLayerProof<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>>::grow_one",
+      "self_fuel": 9680,
+      "inclusive_fuel": 299752,
+      "calls": 121
+    },
+    {
+      "index": 111,
+      "name": "core::slice::sort::stable::drift::sort::<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>), <[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>::sort_by_key<usize, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#3}>::{closure#0}>",
+      "self_fuel": 9281,
+      "inclusive_fuel": 42391,
+      "calls": 4
+    },
+    {
+      "index": 78,
+      "name": "<stwo::core::queries::Queries>::fold",
+      "self_fuel": 8690,
+      "inclusive_fuel": 20675,
+      "calls": 2
+    },
+    {
+      "index": 50,
+      "name": "<alloc::raw_vec::RawVec<(stwo::core::pcs::quotients::PointSample, stwo::core::fields::qm31::QM31)>>::grow_one",
+      "self_fuel": 8640,
+      "inclusive_fuel": 73548,
+      "calls": 108
+    },
+    {
+      "index": 22,
+      "name": "<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::m31::M31>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 8285,
+      "inclusive_fuel": 8285,
+      "calls": 7
+    },
+    {
+      "index": 21,
+      "name": "<alloc::raw_vec::RawVec<stwo::core::fields::m31::M31>>::grow_one",
+      "self_fuel": 8160,
+      "inclusive_fuel": 122631,
+      "calls": 102
+    },
+    {
+      "index": 54,
+      "name": "<stwo::core::poly::line::LineDomain>::new",
+      "self_fuel": 8159,
+      "inclusive_fuel": 23341,
+      "calls": 41
+    },
+    {
+      "index": 125,
+      "name": "<stwo::core::channel::blake2s::Blake2sChannelGeneric<true> as stwo::core::channel::Channel>::draw_u32s",
+      "self_fuel": 7240,
+      "inclusive_fuel": 69128,
+      "calls": 8
+    },
+    {
+      "index": 30,
+      "name": "<soroban_sdk::alloc::bump_pointer::BumpPointerLocal>::alloc_slow",
+      "self_fuel": 7026,
+      "inclusive_fuel": 7164,
+      "calls": 6
+    },
+    {
+      "index": 68,
+      "name": "stwo::core::poly::utils::fold::<stwo::core::fields::qm31::QM31, stwo::core::fields::qm31::QM31>",
+      "self_fuel": 7000,
+      "inclusive_fuel": 7000,
+      "calls": 20
+    },
+    {
+      "index": 164,
+      "name": "<stwo_constraint_framework::info::ArithmeticCounter<false> as stwo::core::fields::FieldExpOps>::square",
+      "self_fuel": 5488,
+      "inclusive_fuel": 5488,
+      "calls": 196
+    },
+    {
+      "index": 124,
+      "name": "<stwo::core::channel::blake2s::Blake2sChannelGeneric<true>>::draw_base_felts",
+      "self_fuel": 4715,
+      "inclusive_fuel": 49360,
+      "calls": 5
+    },
+    {
+      "index": 64,
+      "name": "<itertools::adaptors::coalesce::CoalesceBy<core::iter::adapters::map::Map<core::slice::iter::Iter<usize>, <stwo::core::queries::Queries>::fold::{closure#0}>, itertools::adaptors::coalesce::DedupPred2CoalescePred<itertools::adaptors::coalesce::DedupEq>, itertools::adaptors::coalesce::NoCount> as core::iter::traits::iterator::Iterator>::next",
+      "self_fuel": 4675,
+      "inclusive_fuel": 4675,
+      "calls": 42
+    },
+    {
+      "index": 89,
+      "name": "<stwo::core::vcs_lifted::blake2_merkle::Blake2sM31MerkleChannel as stwo::core::channel::MerkleChannel>::mix_hash",
+      "self_fuel": 4225,
+      "inclusive_fuel": 28870,
+      "calls": 5
+    },
+    {
+      "index": 148,
+      "name": "<stwo::core::channel::blake2s::Blake2sChannelGeneric<true> as stwo::core::channel::Channel>::mix_felts",
+      "self_fuel": 4194,
+      "inclusive_fuel": 102567,
+      "calls": 2
+    },
+    {
+      "index": 67,
+      "name": "<stwo::core::fields::cm31::CM31 as stwo::core::fields::FieldExpOps>::inverse",
+      "self_fuel": 4048,
+      "inclusive_fuel": 23644,
+      "calls": 23
+    },
+    {
+      "index": 92,
+      "name": "<alloc::rc::Rc<core::cell::RefCell<stwo_constraint_framework::info::ArithmeticCounts>>>::drop_slow",
+      "self_fuel": 3965,
+      "inclusive_fuel": 3965,
+      "calls": 305
+    },
+    {
+      "index": 66,
+      "name": "stwo::core::fields::montgomery_batch_inverse::<stwo::core::fields::cm31::CM31>",
+      "self_fuel": 3948,
+      "inclusive_fuel": 25536,
+      "calls": 21
+    },
+    {
+      "index": 141,
+      "name": "<stwo::core::pcs::verifier::CommitmentSchemeVerifier<stwo::core::vcs_lifted::blake2_merkle::Blake2sM31MerkleChannel>>::commit",
+      "self_fuel": 3921,
+      "inclusive_fuel": 26743,
+      "calls": 3
+    },
+    {
+      "index": 63,
+      "name": "<alloc::collections::btree::map::IntoIter<&usize, alloc::collections::btree::set_val::SetValZST>>::dying_next",
+      "self_fuel": 3397,
+      "inclusive_fuel": 3397,
+      "calls": 23
+    },
+    {
+      "index": 177,
+      "name": "memcmp",
+      "self_fuel": 3376,
+      "inclusive_fuel": 3376,
+      "calls": 4
+    },
+    {
+      "index": 117,
+      "name": "core::slice::sort::stable::drift::sort::<(alloc::vec::Vec<stwo::core::fields::m31::M31>, &u32), <[(alloc::vec::Vec<stwo::core::fields::m31::M31>, &u32)]>::sort_by_key<&u32, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#0}>::{closure#0}>",
+      "self_fuel": 3082,
+      "inclusive_fuel": 3082,
+      "calls": 1
+    },
+    {
+      "index": 115,
+      "name": "core::slice::sort::shared::smallsort::sort4_stable::<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>), <[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>::sort_by_key<usize, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#3}>::{closure#0}>",
+      "self_fuel": 3060,
+      "inclusive_fuel": 3060,
+      "calls": 20
+    },
+    {
+      "index": 142,
+      "name": "<stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::new",
+      "self_fuel": 2915,
+      "inclusive_fuel": 2915,
+      "calls": 5
+    },
+    {
+      "index": 37,
+      "name": "alloc::vec::from_elem::<u32>",
+      "self_fuel": 2445,
+      "inclusive_fuel": 3042,
+      "calls": 4
+    },
+    {
+      "index": 87,
+      "name": "<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>::reserve",
+      "self_fuel": 2314,
+      "inclusive_fuel": 42874,
+      "calls": 26
+    },
+    {
+      "index": 65,
+      "name": "<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>> as alloc::vec::spec_from_elem::SpecFromElem>::from_elem::<alloc::alloc::Global>",
+      "self_fuel": 1785,
+      "inclusive_fuel": 3377,
+      "calls": 2
+    },
+    {
+      "index": 75,
+      "name": "core::slice::sort::shared::smallsort::bidirectional_merge::<&usize, <&usize as core::cmp::PartialOrd>::lt>",
+      "self_fuel": 1773,
+      "inclusive_fuel": 1773,
+      "calls": 3
+    },
+    {
+      "index": 144,
+      "name": "<stwo::core::channel::blake2s::Blake2sChannelGeneric<true> as stwo::core::channel::Channel>::mix_u32s",
+      "self_fuel": 1748,
+      "inclusive_fuel": 26940,
+      "calls": 3
+    },
+    {
+      "index": 114,
+      "name": "core::slice::sort::shared::smallsort::sort8_stable::<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>), <[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>::sort_by_key<usize, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#3}>::{closure#0}>",
+      "self_fuel": 1712,
+      "inclusive_fuel": 7976,
+      "calls": 8
+    },
+    {
+      "index": 81,
+      "name": "<alloc::raw_vec::RawVec<stwo::core::fields::cm31::CM31>>::grow_one",
+      "self_fuel": 1680,
+      "inclusive_fuel": 14301,
+      "calls": 21
+    },
+    {
+      "index": 143,
+      "name": "<stwo::core::channel::blake2s::Blake2sChannelGeneric<true> as stwo::core::channel::Channel>::verify_pow_nonce",
+      "self_fuel": 1680,
+      "inclusive_fuel": 31928,
+      "calls": 2
+    },
+    {
+      "index": 7,
+      "name": "<postcard::de::deserializer::SeqAccess<postcard::de::flavors::Slice> as serde_core::de::SeqAccess>::next_element::<stwo::core::fri::FriProof<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>",
+      "self_fuel": 1516,
+      "inclusive_fuel": 186650,
+      "calls": 1
+    },
+    {
+      "index": 6,
+      "name": "<postcard::de::deserializer::SeqAccess<postcard::de::flavors::Slice> as serde_core::de::SeqAccess>::next_element::<stwo::core::fri::FriLayerProof<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>",
+      "self_fuel": 1500,
+      "inclusive_fuel": 183586,
+      "calls": 3
+    },
+    {
+      "index": 109,
+      "name": "core::slice::sort::stable::driftsort_main::<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>), <[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>::sort_by_key<usize, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#3}>::{closure#0}, alloc::vec::Vec<(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)>>",
+      "self_fuel": 1360,
+      "inclusive_fuel": 43751,
+      "calls": 4
+    },
+    {
+      "index": 71,
+      "name": "core::slice::sort::stable::quicksort::quicksort::<&usize, <&usize as core::cmp::PartialOrd>::lt>",
+      "self_fuel": 1260,
+      "inclusive_fuel": 3993,
+      "calls": 1
+    },
+    {
+      "index": 18,
+      "name": "<alloc::raw_vec::RawVec<alloc::vec::Vec<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>>>>::grow_one",
+      "self_fuel": 1200,
+      "inclusive_fuel": 24148,
+      "calls": 15
+    },
+    {
+      "index": 88,
+      "name": "<stwo::core::fields::qm31::QM31 as stwo::core::fields::FieldExpOps>::inverse",
+      "self_fuel": 1062,
+      "inclusive_fuel": 3934,
+      "calls": 2
+    },
+    {
+      "index": 80,
+      "name": "<stwo::core::fields::qm31::QM31>::from_partial_evals",
+      "self_fuel": 906,
+      "inclusive_fuel": 6942,
+      "calls": 2
+    },
+    {
+      "index": 26,
+      "name": "<alloc::vec::Vec<u8>>::reserve",
+      "self_fuel": 890,
+      "inclusive_fuel": 9914,
+      "calls": 10
+    },
+    {
+      "index": 165,
+      "name": "<stwo_constraint_framework::component::FrameworkComponent<stwo_soroban_air::FibSqEval> as stwo::core::air::Component>::trace_log_degree_bounds",
+      "self_fuel": 800,
+      "inclusive_fuel": 3494,
+      "calls": 1
+    },
+    {
+      "index": 176,
+      "name": "compiler_builtins::mem::memmove",
+      "self_fuel": 782,
+      "inclusive_fuel": 782,
+      "calls": 1
+    },
+    {
+      "index": 16,
+      "name": "<alloc::raw_vec::RawVecInner>::try_allocate_in",
+      "self_fuel": 778,
+      "inclusive_fuel": 74361,
+      "calls": 2
+    },
+    {
+      "index": 70,
+      "name": "core::slice::sort::stable::drift::sort::<&usize, <&usize as core::cmp::PartialOrd>::lt>",
+      "self_fuel": 757,
+      "inclusive_fuel": 4750,
+      "calls": 1
+    },
+    {
+      "index": 10,
+      "name": "<postcard::de::deserializer::SeqAccess<postcard::de::flavors::Slice> as serde_core::de::SeqAccess>::next_element::<stwo::core::fri::FriConfig>",
+      "self_fuel": 720,
+      "inclusive_fuel": 720,
+      "calls": 2
+    },
+    {
+      "index": 76,
+      "name": "<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>::double_x",
+      "self_fuel": 681,
+      "inclusive_fuel": 3921,
+      "calls": 3
+    },
+    {
+      "index": 39,
+      "name": "<hashbrown::raw::RawTable<usize>>::reserve_rehash::<indexmap::inner::get_hash<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>, alloc::vec::Vec<stwo::core::pcs::quotients::NumeratorData>>::{closure#0}>",
+      "self_fuel": 591,
+      "inclusive_fuel": 1073,
+      "calls": 1
+    },
+    {
+      "index": 74,
+      "name": "core::slice::sort::shared::smallsort::sort4_stable::<&usize, <&usize as core::cmp::PartialOrd>::lt>",
+      "self_fuel": 532,
+      "inclusive_fuel": 532,
+      "calls": 4
+    },
+    {
+      "index": 35,
+      "name": "foldhash::seed::global::generate_global_seed",
+      "self_fuel": 514,
+      "inclusive_fuel": 514,
+      "calls": 1
+    },
+    {
+      "index": 168,
+      "name": "core::ptr::drop_in_place::<stwo_constraint_framework::component::FrameworkComponent<stwo_soroban_air::FibSqEval>>",
+      "self_fuel": 493,
+      "inclusive_fuel": 4126,
+      "calls": 1
+    },
+    {
+      "index": 79,
+      "name": "<alloc::raw_vec::RawVec<stwo::core::pcs::quotients::NumeratorData>>::grow_one",
+      "self_fuel": 480,
+      "inclusive_fuel": 26089,
+      "calls": 6
+    },
+    {
+      "index": 73,
+      "name": "core::slice::sort::shared::smallsort::sort8_stable::<&usize, <&usize as core::cmp::PartialOrd>::lt>",
+      "self_fuel": 428,
+      "inclusive_fuel": 1798,
+      "calls": 2
+    },
+    {
+      "index": 100,
+      "name": "<itertools::zip_eq_impl::ZipEq<alloc::vec::into_iter::IntoIter<(&stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>, stwo::core::vcs_lifted::verifier::MerkleDecommitmentLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>)>, alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::m31::M31>>>> as core::iter::traits::iterator::Iterator>::next",
+      "self_fuel": 412,
+      "inclusive_fuel": 412,
+      "calls": 4
+    },
+    {
+      "index": 60,
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<stwo::core::fields::qm31::QM31>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 400,
+      "inclusive_fuel": 400,
+      "calls": 8
+    },
+    {
+      "index": 153,
+      "name": "<alloc::vec::Vec<&stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<&stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>, core::slice::iter::Iter<stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>>>::from_iter",
+      "self_fuel": 376,
+      "inclusive_fuel": 774,
+      "calls": 2
+    },
+    {
+      "index": 154,
+      "name": "<alloc::vec::Vec<stwo::core::vcs::blake2_hash::Blake2sHash> as core::clone::Clone>::clone",
+      "self_fuel": 356,
+      "inclusive_fuel": 22960,
+      "calls": 2
+    },
+    {
+      "index": 44,
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<stwo::core::fields::m31::M31>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 350,
+      "inclusive_fuel": 350,
+      "calls": 7
+    },
+    {
+      "index": 105,
+      "name": "core::slice::sort::stable::driftsort_main::<(alloc::vec::Vec<stwo::core::fields::m31::M31>, &u32), <[(alloc::vec::Vec<stwo::core::fields::m31::M31>, &u32)]>::sort_by_key<&u32, <stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>::verify::{closure#0}>::{closure#0}, alloc::vec::Vec<(alloc::vec::Vec<stwo::core::fields::m31::M31>, &u32)>>",
+      "self_fuel": 340,
+      "inclusive_fuel": 3422,
+      "calls": 1
+    },
+    {
+      "index": 169,
+      "name": "<alloc::vec::Vec<&alloc::vec::Vec<alloc::vec::Vec<isize>>> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<&alloc::vec::Vec<alloc::vec::Vec<isize>>, core::slice::iter::Iter<alloc::vec::Vec<alloc::vec::Vec<isize>>>>>::from_iter",
+      "self_fuel": 340,
+      "inclusive_fuel": 738,
+      "calls": 2
+    },
+    {
+      "index": 90,
+      "name": "<stwo::core::fields::qm31::QM31 as core::ops::arith::Div<stwo::core::fields::m31::M31>>::div",
+      "self_fuel": 318,
+      "inclusive_fuel": 2022,
+      "calls": 2
+    },
+    {
+      "index": 135,
+      "name": "core::ptr::drop_in_place::<core::iter::adapters::flatten::Flatten<core::iter::adapters::flatten::Flatten<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>>>>>",
+      "self_fuel": 309,
+      "inclusive_fuel": 450,
+      "calls": 1
+    },
+    {
+      "index": 11,
+      "name": "<postcard::de::deserializer::SeqAccess<postcard::de::flavors::Slice> as serde_core::de::SeqAccess>::next_element::<u64>",
+      "self_fuel": 285,
+      "inclusive_fuel": 285,
+      "calls": 1
+    },
+    {
+      "index": 69,
+      "name": "core::slice::sort::stable::driftsort_main::<&usize, <&usize as core::cmp::PartialOrd>::lt, alloc::vec::Vec<&usize>>",
+      "self_fuel": 271,
+      "inclusive_fuel": 5021,
+      "calls": 1
+    },
+    {
+      "index": 36,
+      "name": "foldhash::seed::gen_per_hasher_seed",
+      "self_fuel": 255,
+      "inclusive_fuel": 255,
+      "calls": 5
+    },
+    {
+      "index": 41,
+      "name": "core::ptr::drop_in_place::<[alloc::vec::Vec<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>>]>",
+      "self_fuel": 246,
+      "inclusive_fuel": 268,
+      "calls": 1
+    },
+    {
+      "index": 130,
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 242,
+      "inclusive_fuel": 282,
+      "calls": 2
+    },
+    {
+      "index": 45,
+      "name": "core::ptr::drop_in_place::<core::iter::adapters::flatten::Flatten<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::m31::M31>>>>>",
+      "self_fuel": 225,
+      "inclusive_fuel": 284,
+      "calls": 1
+    },
+    {
+      "index": 77,
+      "name": "<stwo::core::fields::qm31::QM31 as core::ops::arith::Sub>::sub",
+      "self_fuel": 222,
+      "inclusive_fuel": 222,
+      "calls": 3
+    },
+    {
+      "index": 85,
+      "name": "<alloc::vec::Vec<alloc::vec::Vec<u32>>>::reserve",
+      "self_fuel": 178,
+      "inclusive_fuel": 178,
+      "calls": 2
+    },
+    {
+      "index": 34,
+      "name": "<foldhash::seed::global::GlobalSeed>::init_slow",
+      "self_fuel": 177,
+      "inclusive_fuel": 1210,
+      "calls": 1
+    },
+    {
+      "index": 128,
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 150,
+      "inclusive_fuel": 150,
+      "calls": 3
+    },
+    {
+      "index": 31,
+      "name": "<alloc::raw_vec::RawVecInner>::try_reserve_exact",
+      "self_fuel": 134,
+      "inclusive_fuel": 591,
+      "calls": 1
+    },
+    {
+      "index": 151,
+      "name": "core::ptr::drop_in_place::<alloc::vec::Vec<stwo::core::fri::FriInnerLayerVerifier<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>>",
+      "self_fuel": 131,
+      "inclusive_fuel": 187,
+      "calls": 1
+    },
+    {
+      "index": 167,
+      "name": "<alloc::vec::Vec<stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 123,
+      "inclusive_fuel": 123,
+      "calls": 1
+    },
+    {
+      "index": 46,
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::m31::M31>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 118,
+      "inclusive_fuel": 118,
+      "calls": 2
+    },
+    {
+      "index": 136,
+      "name": "core::ptr::drop_in_place::<core::iter::adapters::flatten::Flatten<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<&alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>>>>>",
+      "self_fuel": 117,
+      "inclusive_fuel": 117,
+      "calls": 1
+    },
+    {
+      "index": 40,
+      "name": "<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Owned, &usize, alloc::collections::btree::set_val::SetValZST, alloc::collections::btree::node::marker::LeafOrInternal>>::push_internal_level::<alloc::alloc::Global>",
+      "self_fuel": 116,
+      "inclusive_fuel": 315,
+      "calls": 1
+    },
+    {
+      "index": 8,
+      "name": "core::ptr::drop_in_place::<stwo::core::fri::FriLayerProof<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>",
+      "self_fuel": 112,
+      "inclusive_fuel": 112,
+      "calls": 2
+    },
+    {
+      "index": 108,
+      "name": "core::ptr::drop_in_place::<hashbrown::map::IntoIter<usize, alloc::vec::Vec<stwo::core::fields::m31::M31>>>",
+      "self_fuel": 108,
+      "inclusive_fuel": 108,
+      "calls": 4
+    },
+    {
+      "index": 43,
+      "name": "core::ptr::drop_in_place::<[alloc::vec::Vec<u32>]>",
+      "self_fuel": 94,
+      "inclusive_fuel": 94,
+      "calls": 2
+    },
+    {
+      "index": 106,
+      "name": "core::ptr::drop_in_place::<[(alloc::vec::Vec<stwo::core::fields::m31::M31>, &u32)]>",
+      "self_fuel": 88,
+      "inclusive_fuel": 88,
+      "calls": 8
+    },
+    {
+      "index": 149,
+      "name": "<alloc::raw_vec::RawVec<stwo::core::fri::FriInnerLayerVerifier<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>>>::grow_one",
+      "self_fuel": 80,
+      "inclusive_fuel": 681,
+      "calls": 1
+    },
+    {
+      "index": 25,
+      "name": "<soroban_sdk::symbol::Symbol>::new",
+      "self_fuel": 76,
+      "inclusive_fuel": 76,
+      "calls": 1
+    },
+    {
+      "index": 172,
+      "name": "<stwo_constraint_framework::component::FrameworkComponent<stwo_soroban_air::FibSqEval> as stwo::core::air::Component>::preprocessed_column_indices",
+      "self_fuel": 76,
+      "inclusive_fuel": 254,
+      "calls": 1
+    },
+    {
+      "index": 132,
+      "name": "core::ptr::drop_in_place::<[(alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>, alloc::vec::Vec<stwo::core::fields::qm31::QM31>)]>",
+      "self_fuel": 72,
+      "inclusive_fuel": 72,
+      "calls": 6
+    },
+    {
+      "index": 179,
+      "name": "memmove",
+      "self_fuel": 72,
+      "inclusive_fuel": 854,
+      "calls": 1
+    },
+    {
+      "index": 110,
+      "name": "core::ptr::drop_in_place::<[(usize, alloc::vec::Vec<stwo::core::fields::m31::M31>)]>",
+      "self_fuel": 60,
+      "inclusive_fuel": 60,
+      "calls": 4
+    },
+    {
+      "index": 102,
+      "name": "<alloc::vec::into_iter::IntoIter<((&stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>, stwo::core::vcs_lifted::verifier::MerkleDecommitmentLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>), alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::m31::M31>>)> as core::ops::drop::Drop>::drop",
+      "self_fuel": 59,
+      "inclusive_fuel": 59,
+      "calls": 1
+    },
+    {
+      "index": 129,
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::vec::Vec<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 59,
+      "inclusive_fuel": 59,
+      "calls": 1
+    },
+    {
+      "index": 150,
+      "name": "<alloc::vec::into_iter::IntoIter<stwo::core::fri::FriLayerProof<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 59,
+      "inclusive_fuel": 59,
+      "calls": 1
+    },
+    {
+      "index": 101,
+      "name": "<alloc::vec::into_iter::IntoIter<(&stwo::core::vcs_lifted::verifier::MerkleVerifierLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>, stwo::core::vcs_lifted::verifier::MerkleDecommitmentLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>)> as core::ops::drop::Drop>::drop",
+      "self_fuel": 54,
+      "inclusive_fuel": 54,
+      "calls": 1
+    },
+    {
+      "index": 51,
+      "name": "<alloc::vec::into_iter::IntoIter<indexmap::Bucket<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>, alloc::vec::Vec<stwo::core::pcs::quotients::NumeratorData>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 50,
+      "inclusive_fuel": 50,
+      "calls": 1
+    },
+    {
+      "index": 99,
+      "name": "<alloc::vec::into_iter::IntoIter<stwo::core::vcs_lifted::verifier::MerkleDecommitmentLifted<stwo::core::vcs::blake2_hash::Blake2sHasherGeneric<false>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 50,
+      "inclusive_fuel": 50,
+      "calls": 1
+    },
+    {
+      "index": 19,
+      "name": "core::ptr::drop_in_place::<[alloc::vec::Vec<alloc::vec::Vec<stwo::core::fields::qm31::QM31>>]>",
+      "self_fuel": 40,
+      "inclusive_fuel": 40,
+      "calls": 2
+    },
+    {
+      "index": 131,
+      "name": "core::ptr::drop_in_place::<[alloc::vec::Vec<(alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>, alloc::vec::Vec<stwo::core::fields::qm31::QM31>)>]>",
+      "self_fuel": 40,
+      "inclusive_fuel": 40,
+      "calls": 2
+    },
+    {
+      "index": 42,
+      "name": "<alloc::vec::Vec<alloc::vec::Vec<stwo::core::circle::CirclePoint<stwo::core::fields::qm31::QM31>>> as core::ops::drop::Drop>::drop",
+      "self_fuel": 33,
+      "inclusive_fuel": 33,
+      "calls": 3
+    },
+    {
+      "index": 94,
+      "name": "<alloc::vec::Vec<stwo_constraint_framework::preprocessed_columns::PreProcessedColumnId> as core::ops::drop::Drop>::drop",
+      "self_fuel": 22,
+      "inclusive_fuel": 22,
+      "calls": 2
+    },
+    {
+      "index": 166,
+      "name": "<stwo_constraint_framework::component::FrameworkComponent<stwo_soroban_air::FibSqEval> as stwo::core::air::Component>::max_constraint_log_degree_bound",
+      "self_fuel": 7,
+      "inclusive_fuel": 7,
+      "calls": 1
+    }
+  ]
+}

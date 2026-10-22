@@ -10,9 +10,14 @@ default = []
 std = ["stwo/std", "stwo-constraint-framework/std"]
 # Keccak-256 channel instead of Blake2s (Soroban has keccak256 as a host function).
 keccak = []
+# Verifier split into phases, for profiling (crates/air/src/probe.rs). Not for deployment.
+probe = ["itertools", "stwo/probe"]
+# Cheaper verifier, same results (see PATCHES.md, change 6).
+fast = ["stwo/fast"]
 
 [dependencies]
 stwo = { workspace = true }
 stwo-constraint-framework = { workspace = true }
 serde = { workspace = true }
 num-traits = { workspace = true }
+itertools = { workspace = true, optional = true }

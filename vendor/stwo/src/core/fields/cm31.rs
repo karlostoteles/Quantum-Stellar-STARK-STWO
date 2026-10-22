@@ -44,8 +44,10 @@ impl Debug for CM31 {
 impl Mul for CM31 {
     type Output = Self;
 
+    #[cfg_attr(feature = "fast", inline(always))]
     fn mul(self, rhs: Self) -> Self::Output {
         // (a + bi) * (c + di) = (ac - bd) + (ad + bc)i.
+        crate::op_count!(CM31_MUL);
         Self(self.0 * rhs.0 - self.1 * rhs.1, self.0 * rhs.1 + self.1 * rhs.0)
     }
 }
@@ -65,6 +67,7 @@ impl FieldExpOps for CM31 {
     fn inverse(&self) -> Self {
         assert!(!self.is_zero(), "0 has no inverse");
         // 1 / (a + bi) = (a - bi) / (a^2 + b^2).
+        crate::op_count!(CM31_INV);
         Self(self.0, -self.1) * (self.0.square() + self.1.square()).inverse()
     }
 }

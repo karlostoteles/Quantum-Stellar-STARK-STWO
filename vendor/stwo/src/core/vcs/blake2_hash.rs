@@ -70,22 +70,71 @@ pub type Blake2sHasher = Blake2sHasherGeneric<false>;
 /// Same as [Blake2sHasher], expect that the hash output is taken modulo M31::P.
 pub type Blake2sM31Hasher = Blake2sHasherGeneric<true>;
 
+
+/// stwo-soroban patch (`fast`): Blake2s-256 of one 64-byte block (a Merkle node) through the
+/// `blake2` crate's core API, skipping the streaming wrapper's buffer bookkeeping. Same digest.
+#[cfg(feature = "fast")]
+pub mod fast_blake2s {
+    use blake2::Blake2sVarCore;
+    use blake2::digest::core_api::{Buffer, VariableOutputCore};
+
+    /// Blake2s-256 of `left ‖ right` (64 bytes) in one compression.
+    pub fn hash_two(left: &[u8; 32], right: &[u8; 32]) -> [u8; 32] {
+        let mut block = [0u8; 64];
+        block[..32].copy_from_slice(left);
+        block[32..].copy_from_slice(right);
+        let mut core = Blake2sVarCore::new(32).expect("32-byte Blake2s");
+        let mut buffer = Buffer::<Blake2sVarCore>::new(&block);
+        let mut out = blake2::digest::Output::<Blake2sVarCore>::default();
+        core.finalize_variable_core(&mut buffer, &mut out);
+        out.into()
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use blake2::Digest;
+
+        #[test]
+        fn matches_the_streaming_hash() {
+            for (a, b) in [([1u8; 32], [2u8; 32]), ([0u8; 32], [0u8; 32]), ([0xffu8; 32], [7u8; 32])] {
+                let mut both = [0u8; 64];
+                both[..32].copy_from_slice(&a);
+                both[32..].copy_from_slice(&b);
+                let expected: [u8; 32] = blake2::Blake2s256::digest(both).into();
+                assert_eq!(super::hash_two(&a, &b), expected);
+            }
+        }
+    }
+}
+
 // Wrapper for the blake2s Hashing functionalities.
 #[derive(Clone, Debug, Default)]
 pub struct Blake2sHasherGeneric<const IS_M31_OUTPUT: bool> {
     state: Blake2s256,
+    #[cfg(feature = "op-count")]
+    len: usize,
 }
 
 impl<const IS_M31_OUTPUT: bool> Blake2sHasherGeneric<IS_M31_OUTPUT> {
     pub fn new() -> Self {
-        Self { state: Blake2s256::new() }
+        Self {
+            state: Blake2s256::new(),
+            #[cfg(feature = "op-count")]
+            len: 0,
+        }
     }
 
     pub fn update(&mut self, data: &[u8]) {
+        #[cfg(feature = "op-count")]
+        {
+            self.len += data.len();
+        }
         blake2::Digest::update(&mut self.state, data);
     }
 
     pub fn finalize(self) -> Blake2sHash {
+        #[cfg(feature = "op-count")]
+        crate::core::op_count::blake2s_finalized(self.len);
         let mut r: [u8; 32] = self.state.finalize().into();
         if IS_M31_OUTPUT {
             r = reduce_to_m31(r);

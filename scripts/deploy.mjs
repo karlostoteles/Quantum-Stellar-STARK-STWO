@@ -8,6 +8,7 @@
 // Keys live in .keys/<network>.json (git-ignored). On testnet the account is funded by friendbot;
 // on mainnet it must be funded by hand. Results are appended to deployments/<network>.json.
 //
+// VARIANT=fast uses the build from `FAST=1 ./scripts/build-contract.sh` (deployments/testnet-fast.json).
 // VARIANT=keccak uses the build from `KECCAK=1 ./scripts/build-contract.sh` and logs to
 // deployments/<network>-keccak.json, so it is deployed as a separate contract.
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
@@ -20,7 +21,7 @@ import {
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const VARIANT = process.env.VARIANT || "";
-if (!["", "keccak"].includes(VARIANT)) throw new Error(`unknown VARIANT ${VARIANT}`);
+if (!["", "keccak", "fast"].includes(VARIANT)) throw new Error(`unknown VARIANT ${VARIANT}`);
 const WASM = join(ROOT, `target/wasm32v1-none/${VARIANT ? `contract-${VARIANT}` : "contract"}/stwo_soroban_verifier.wasm`);
 const NETS = {
   testnet: { rpc: "https://soroban-testnet.stellar.org", passphrase: Networks.TESTNET, explorer: "https://stellar.expert/explorer/testnet" },

@@ -8,6 +8,20 @@
 #![cfg_attr(feature = "prover", feature(iter_array_chunks, portable_simd, slice_ptr_get))]
 pub mod core;
 
+/// stwo-soroban patch: bumps an operation counter when the `op-count` feature is on.
+#[cfg(feature = "op-count")]
+#[macro_export]
+macro_rules! op_count {
+    ($c:ident) => {
+        $crate::core::op_count::$c.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+    };
+}
+#[cfg(not(feature = "op-count"))]
+#[macro_export]
+macro_rules! op_count {
+    ($c:ident) => {};
+}
+
 #[cfg(feature = "prover")]
 pub mod prover;
 #[cfg(feature = "tracing")]
